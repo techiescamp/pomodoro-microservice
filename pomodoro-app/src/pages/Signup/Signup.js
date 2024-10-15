@@ -46,10 +46,6 @@ const Signup = () => {
         });
     }
 
-    const registerGoogle = () => {
-        window.open(`${apiUrl}/auth/google`, "_self");
-    }
-
     const inlineStyle = {
         color: getColor(),
         borderRadius: '10px',
@@ -107,15 +103,7 @@ const Signup = () => {
                         </div>
                     </form>
 
-                    <p className='m-3'>Or continue with:</p>
-
-                    <div className='w-75 mx-auto'>
-                        <button className='btn btn-outline-secondary w-100 mb-3 social-btn' onClick={registerGoogle}>
-                            <i className="bi bi-google text-danger me-2"></i> Google
-                        </button>
-                    </div>
-
-                    <p>Already have an account ? <Link to='/login'>Login here</Link></p>
+                    <p className='m-3'>Already have an account ? <Link to='/login'>Login here</Link></p>
 
                     <hr className='w-50 mx-auto' />
 

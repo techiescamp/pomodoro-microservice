@@ -53,7 +53,7 @@ const Login = () => {
             });
         })
         .catch(err => {
-            console.log(err.response)
+            // console.log(err.response)
             if(err.response && err.response.status === 401) {
                 setStatus({message: err.response.data.message})
             } else if(err.response && err.response.status === 402) {
@@ -61,7 +61,7 @@ const Login = () => {
             } else if(err.code === 'ERR_NETWORK') {
                 setStatus(err.message);
             } else if(err.code === 'ERR_BAD_REQUEST') {
-                setStatus({message: 'Request failed with status code 401 - Axios Error'})
+                setStatus({message: 'Server is not online'})
             }
         })
         setUserLogin({
@@ -70,26 +70,11 @@ const Login = () => {
         });
     }
 
-    const loginGoogle = () => {
-        const correlationId = `pomo-${Math.ceil(Math.random() * 500)}`;
-        sessionStorage.setItem('xCorrId', correlationId);
-        setLoginType('google');
-        sessionStorage.setItem('loginType', 'google')
-        window.open(`${apiUrl}/auth/google`, "_self")
-    }
-
     const inlineStyle = {
-        // color: getColor(),
         borderRadius: '10px',
         padding: '5px'
     }
-    // function getColor() {
-    //     if (status.success) {
-    //         return 'green'
-    //     } else {
-    //         return 'red'
-    //     }
-    // }
+
 
     return (
         <main className='main-container text-center'>
@@ -125,14 +110,8 @@ const Login = () => {
                             <button className='btn btn-primary w-100'>Continue</button>
                         </div>
                     </form>
-                    <p className='m-3'>Or continue with:</p>
-                    <div className='w-75 mx-auto'>
-                        <button className='btn btn-outline-secondary w-100 mb-3 social-btn' onClick={loginGoogle}>
-                            <i className="bi bi-google text-danger me-2"></i> Google
-                        </button>
-
-                    </div>
-                    <p>Can't Login ? <Link to='/signup'>Create Account</Link></p>
+                    
+                    <p className='m-3'>Can't Login ? <Link to='/signup'>Create Account</Link></p>
                     <hr className='w-50 mx-auto' />
                     <div>
                         <h4 className='mb-3 text-danger fw-bold'>Pomodoro</h4>
