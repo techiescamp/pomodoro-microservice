@@ -10,17 +10,11 @@ const config = {
     secrets: {
         jwt_key: process.env.JWT_SECRET
     },
-    googleAuth: {
-        clientId: process.env.GOOGLE_CLIENT_ID,
-        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-        redirectUrl: process.env.GOOGLE_REDIRECT_URI
-    },
     session: {
         secret: process.env.SESSION_SECRET
     },
     urls: {
-        baseUrl: process.env.BASE_URL,
-        google_redirect_success: process.env.GOOGLE_REDIRECT_SUCCESS
+        baseUrl: process.env.BASE_URL
     },
     mail: {
         email: process.env.ZOHO_MAIL,

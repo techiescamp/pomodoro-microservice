@@ -36,18 +36,12 @@ app.use(cors({
 // log middleware
 app.use(correlationIdMiddleware)
 
-// passport and oauth middleware
-require('./middlewares/passport');
 // session middleware
 app.use(session({
   secret: config.session.secret,
   resave: false,
   saveUninitialized: false,
 }));
-
-// passport middleware
-app.use(passport.initialize());
-app.use(passport.session());
 
 // http response time for each routes
 app.use(
