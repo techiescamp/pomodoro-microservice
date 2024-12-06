@@ -185,7 +185,6 @@ const login = async (req, res) => {
     }
 }
 
-
 const verifyUser = async (req, res) => {
     const span = tracer.startSpan('VerifyUser', {
         attributes: { 'x-correlation-id': req.correlationId }
@@ -301,10 +300,27 @@ const updateUser = async (req, res) => {
     }
 }
 
+const logout = (req, res) => {
+    const span = tracer.startSpan('user logout', {
+        attributes: { 'x-correlation-id': req.correlationId }
+    });
+    metrics.httpRequestCounter.inc();
+
+    const logResult = {
+        statusCode: res.statusCode,
+        responseTime: res.responseTime
+    }
+    span.addEvent('User logged out!!')
+    logger.info('User logged out!', logFormat(req, logResult));
+    span.end();
+    return res.status(200).redirect(config.urls.baseUrl)
+}
+
 
 module.exports = {
     signup: signup,
     login: login,
     verifyUser: verifyUser,
-    updateUser: updateUser
+    updateUser: updateUser,
+    logout: logout
 }

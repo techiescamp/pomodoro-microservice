@@ -7,7 +7,8 @@ import { UserContext } from '../../App';
 const apiUrl = config.apiUrl;
 
 const Login = () => {
-    const { xCorrId, setLoginType } = useContext(UserContext)
+    console.log(apiUrl);
+    const { xCorrId } = useContext(UserContext)
     const navigate = useNavigate();
 
     const [status, setStatus] = useState(null);
@@ -26,6 +27,7 @@ const Login = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         const cid = xCorrId || `pomo-${Math.ceil(Math.random()*1000)}`;
+        console.log(`${apiUrl}/user/login`)
         axios.post(`${apiUrl}/user/login`, userLogin, {
             headers: {
                 'x-correlation-id': cid
