@@ -5,7 +5,8 @@ const TaskTracker = require('../Model/timerModel');
 const { tracer } = require('../Observability/jaegerTrace');
 const metrics = require('../Observability/metrics');
 const { trace, context, propagation } = require('@opentelemetry/api')
-
+const config = require('../config');
+const reportsUrl = config.urls.reportsUrl; 
 
 const checkTodayTasks = async (req, res) => {
     const span = tracer.startSpan('check today tasks', {
@@ -135,11 +136,16 @@ const reportService = async (req, res) => {
             // inject trace context into headers
             propagation.inject(context.active(), headers);
 
-            const result = await axios.post('http://localhost:7070/tasks', user, {
+            const result = await axios.post(`${reportsUrl}/tasks`, user, {
                 headers: headers
             })
             span.end()
-            return res.status(200).json(result.data.existingUser)
+            console.log('result: ', result);
+            if(result.data.task) {
+                return res.status(200).json(result.data.existingUser)
+            } else {
+                return;
+            }
         })
     }
     catch (err) {

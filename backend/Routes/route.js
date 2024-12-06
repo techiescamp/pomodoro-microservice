@@ -1,7 +1,7 @@
 const express = require('express');
 
 const { checkTodayTasks, createTask, reportService } = require('../Controllers/timerController');
-const { signup, login, verifyUser, updateUser } = require('../Controllers/userController');
+const { signup, login, verifyUser, updateUser, logout } = require('../Controllers/userController');
 const { sendMails, subscribe } = require('../Controllers/mailController');
 
 const route = express.Router();
@@ -17,7 +17,7 @@ route.post('/user/signup', signup);
 route.post('/user/login', login);
 route.post('/user/verifyUser', verifyUser);
 route.post('/user/updateUser', updateUser);
-
+route.get('/user/logout', logout);
 
 // mail routes for subscriptions
 route.post('/subscribe', subscribe);

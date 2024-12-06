@@ -79,8 +79,10 @@ app.post('/tasks', async (req, res) => {
     const queryEndTime = process.hrtime(queryStartTime);
     const queryDuration = queryEndTime[0] * 1e9 + queryEndTime[1];            
     metrics.databaseQueryDurationHistogram.observe({operation: 'Task list - findOne', success: existingUser ? 'true': 'false'}, queryDuration / 1e9);
+    
     try {
-        if(existingUser) {
+        console.log(`report-user: ${existingUser}`)
+        if(existingUser) {        
             // run following code within context of new span
             await context.with(ctx, async() => {      
                 span.addEvent('user task list sent to browser', {requestBody: req.body.email})

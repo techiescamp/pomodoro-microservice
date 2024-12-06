@@ -14,7 +14,8 @@ const config = {
         secret: process.env.SESSION_SECRET
     },
     urls: {
-        baseUrl: process.env.BASE_URL
+        baseUrl: process.env.BASE_URL,
+        reportsUrl: process.env.REPORTS_URL
     },
     mail: {
         email: process.env.ZOHO_MAIL,

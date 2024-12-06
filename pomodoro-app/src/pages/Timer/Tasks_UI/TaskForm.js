@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo } from 'react'
+import React, { useContext, useEffect } from 'react'
 import { MyContext } from '../Timer';
 import TaskButtons from './TaskButtons';
 import '../Timer.css';
@@ -21,17 +21,6 @@ const TaskForm = ({ form, setForm, isUpdate, setIsUpdate }) => {
             JSON.parse(sessionStorage.getItem('todaysTask')) 
             : []
 
-    // warnings
-    // const checkedTasks = useMemo(() => {
-    //     return sessionStorage.getItem('checkedTasks') ? 
-    //         JSON.parse(sessionStorage.getItem('checkedTasks')) 
-    //         : []
-    // }, [])  // Empty dependency array means this memoization runs only once
-    // const todaysTask = useMemo(() => {
-    //     return sessionStorage.getItem('todaysTask') ? 
-    //         JSON.parse(sessionStorage.getItem('todaysTask')) 
-    //         : []
-    // }, [])  // Empty dependency array means this memoization runs only once
 
     useEffect(() => {
          // if user logged again today ? integrate old tasks to today's tasks 
@@ -48,7 +37,7 @@ const TaskForm = ({ form, setForm, isUpdate, setIsUpdate }) => {
                 sessionStorage.setItem('todaysTask', JSON.stringify(uniqueTask))
             })
         }
-    },[todayDate, checkedTasks, todaysTask, user])
+    },[todayDate, checkedTasks, todaysTask, user, xCorrId])
 
     const handleChange = (e) => {
         setForm({

@@ -11,23 +11,20 @@ function Header() {
 
   const { user, setUser, xCorrId } = useContext(UserContext);
   const usersession = JSON.parse(sessionStorage.getItem('userInfo')) || null;
-  const gusersession = JSON.parse(sessionStorage.getItem('guser')) || null;
 
   useEffect(() => {
     const getUser = async () => {
       if(usersession) {
-        setUser(usersession)
-      } else if(gusersession) {
         setUser(usersession)
       } else {
         setUser(null)
       }
     }
     getUser();
-  },[loc])
+  }, [loc])
 
   const handlelogout = () => {
-    fetch(`${apiUrl}/auth/logout`, {
+    fetch(`${apiUrl}/user/logout`, {
       method: 'GET',
       headers: {
         'x-correlation-id': usersession.xCorrId || xCorrId
@@ -57,11 +54,7 @@ function Header() {
               <ul className='navbar-nav me-lg-5 mb-lg-0'>
                 <li className='nav-item me-lg-4 mb-1 mb-lg-0 dropdown'>
                   <button className='px-3 py-1 mx-auto rounded-pill border border-info-subtle d-flex align-items-md-center dropdown-toggle' type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    {user.avatar.imgType === 'text' ?  
-                      <span className="avatar me-2">{user.avatar.data}</span>
-                      :
-                      <img src={user.avatar.data} className='me-2 rounded-pill' alt='avatar' width='20px' height='20px' />
-                    }
+                    <span className="avatar me-2">{user.avatar.data}</span>
                     <span className="">{user.displayName}</span>
                   </button>
                   <ul className='dropdown-menu'>
