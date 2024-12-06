@@ -4,9 +4,7 @@ FROM node:20.12.2-alpine
 WORKDIR /app
 
 # Copy files from local to the work directory
-COPY /public ./public
-COPY /src ./src
-COPY /package*.json ./
+COPY . .
 
 # Install all dependencies
 RUN npm install
