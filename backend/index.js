@@ -192,7 +192,7 @@ app.listen(PORT, (err, client) => {
     logger.error('Server is not connected', err)
   }
   isServerReady = true;
-  logger.info('server connected at PORT: ', PORT)
+  logger.info(`server connected at PORT: ${PORT}`)
   if (db) {
     isDatabaseReady = true;
     logger.info('MongoDB database is connected.')

@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
-    googleId: String,
-    userId: String,
+    googleId: String || null,
+    userId: String || null,
     displayName: {
         type: String,
         required: true
