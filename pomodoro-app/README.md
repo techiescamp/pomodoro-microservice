@@ -1,6 +1,6 @@
 # Frontend Docker Setup
 
-This repository provides instructions to build and run the frontend application as a Docker container, leveraging environment variables for configuration.
+This repository provides instructions to build and run the frontend application as a Docker container, using environment variables for configuration.
 
 ---
 
