@@ -47,13 +47,13 @@ If your .env file is not in the current directory, specify its full path when ru
 Run the Docker container using this command:
 
 ```bash
-docker run -d -p 3000:3000 --env-file .env pomodoro-backend:1.0.0
+docker run -d -p 7000:7000 --env-file .env pomodoro-backend:1.0.0
 ```
 
 If your *.env* file is located in another directory, specify the path like this:
 
 ```bash
-docker run -d -p 3000:3000 --env-file /path/to/.env pomodoro-backend:1.0.0
+docker run -d -p 7000:7000 --env-file /path/to/.env pomodoro-backend:1.0.0
 ```
 
 ## Debugging Tips
