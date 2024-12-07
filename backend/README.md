@@ -26,7 +26,7 @@ JAEGER_TRACE_URI=http://52.43.65.153:30894
 SESSION_SECRET=supersecret
 JWT_SECRET=mysecret
 
-MONGODB_URL=mongodb+srv://sravyaveeravalli123:uA2BVKbTItS31tZL@cluster001.75y5hoz.mongodb.net/Pomodoro?retryWrites=true&w=majority
+MONGODB_URL=<mongodburl>
 ```
 ### Details
 
