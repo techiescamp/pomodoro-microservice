@@ -28,9 +28,6 @@ JAEGER_TRACE_URI=http://52.43.65.153:30894
 - *MONGODB_URL*: The connection URL for your MongoDB database.
 - *JAEGER_TRACE_URI*: (Optional) URL for Jaeger tracing, if available.
 
-### Note
-
-If your .env file is not in the current directory, specify its full path when running the Docker container.
 
 ## Run Docker image
 

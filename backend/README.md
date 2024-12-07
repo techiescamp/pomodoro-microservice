@@ -38,9 +38,6 @@ MONGODB_URL=<mongodburl>
 - *JWT_SECRET* : Secret key for signing and verifying JSON Web Tokens (JWTs).
 - *MONGODB_URL*: The connection URL for your MongoDB database.
 
-### Note
-
-If your .env file is not in the current directory, specify its full path when running the Docker container.
 
 ## Run Docker Image
 
