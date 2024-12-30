@@ -18,7 +18,7 @@ const TaskList = ({ todo, setTodo, handleEdit }) => {
 
     return (
         <ListGroup>
-            {todo ? todo.map(item => {
+            {todo && todo.map(item => {
                 return (
                 <ListGroup.Item key={item.id} className='mb-2 align-items-center'>
                     <Dropdown id='dropdown-task'>
@@ -57,7 +57,7 @@ const TaskList = ({ todo, setTodo, handleEdit }) => {
                     }
                 </ListGroup.Item>
                 )
-             }) : null }
+             })}
         </ListGroup>
     )
 }
