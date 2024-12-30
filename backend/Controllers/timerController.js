@@ -6,7 +6,37 @@ const { tracer } = require('../Observability/jaegerTrace');
 const metrics = require('../Observability/metrics');
 const { trace, context, propagation } = require('@opentelemetry/api')
 const config = require('../config');
-const reportsUrl = config.urls.reportsUrl; 
+const reportsUrl = config.urls.reportsUrl;
+
+const getTasks = async (req, res) => {
+    try {
+        const getTaskList = await TaskTracker.find({ "userData.email": req.body.email }, { _id: 0, "userTasks": 1 });
+        const uncheckedTasks = [];
+
+        // Iterate over the userTasks array and update the tasks
+        getTaskList.forEach(user => {
+            user.userTasks.forEach(taskGroup => {
+                // Get "checked = false" tasks
+                const unTasks = taskGroup.tasks.filter(t => !t.checked);
+                uncheckedTasks.push(...unTasks);
+
+                // Remove unchecked tasks from the original list
+                taskGroup.tasks = taskGroup.tasks.filter(t => t.checked);
+            });
+        });
+
+        // Update the database
+        await TaskTracker.findOneAndUpdate(
+            { "userData.email": req.body.email }, // Filter
+            { $set: { userTasks: getTaskList[0].userTasks } }, // Update data (adjusting for the array structure)
+            { upsert: true, new: true } // Options
+        );
+        res.status(200).send(uncheckedTasks);
+
+    } catch (error) {
+        console.log("Error in getting tasks ", error)
+    }
+}
 
 const checkTodayTasks = async (req, res) => {
     const span = tracer.startSpan('check today tasks', {
@@ -140,8 +170,7 @@ const reportService = async (req, res) => {
                 headers: headers
             })
             span.end()
-            console.log('result: ', result);
-            if(result.data.task) {
+            if (result.data.task) {
                 return res.status(200).json(result.data.existingUser)
             } else {
                 return;
@@ -157,6 +186,7 @@ const reportService = async (req, res) => {
 
 
 module.exports = {
+    getTasks: getTasks,
     checkTodayTasks: checkTodayTasks,
     createTask: createTask,
     reportService: reportService,

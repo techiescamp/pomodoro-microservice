@@ -1,14 +1,18 @@
-import React, { useState, createContext, useEffect } from 'react';
+import React, { useState, createContext, useEffect, useContext } from 'react';
 import TaskUI from './Tasks_UI/TaskUI';
 import TNavbar from './TimerNavbar.js/TNavbar';
 import TimerContent from './TimerContent';
 import TimerUI from './Timer_UI/TimerUI';
 import Dropdown from 'react-bootstrap/Dropdown';
+import { UserContext } from '../../App';
 import './Timer.css';
+import axios from 'axios';
 
 export const MyContext = createContext();
+const API_URL = "http://localhost:7000/getTasks"
 
 const Timer = () => {
+    const { user } = useContext(UserContext);
     const [todo, setTodo] = useState(() => {
         const storedTasks = sessionStorage.getItem('todo');
         const checkedTasks = sessionStorage.getItem('checkedTasks');
@@ -21,7 +25,16 @@ const Timer = () => {
 
     useEffect(() => {
         setIsLoading(true)
-    },[])
+        const fetchTasks = async() => {
+            try {
+                const response = await axios.post(API_URL, user)
+                setTodo(response.data)
+            } catch(error) {
+                console.log("Error in fetching tasks")
+            }
+        }
+        if(user) fetchTasks()
+    },[user])
 
     const handleAddTask = () => {
         let taskform = document.getElementById('taskform');

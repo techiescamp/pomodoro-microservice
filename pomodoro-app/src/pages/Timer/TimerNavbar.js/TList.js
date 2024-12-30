@@ -10,7 +10,6 @@ const metrics_url = config.metrics_url;
 
 const TList = ({user, show, setShow, list}) => {
     const handleClose = () => setShow(false);
-    console.log(list)
 
     const downloadbtn = async () => {
         const tb = document.getElementById('tableList');
@@ -57,7 +56,7 @@ const TList = ({user, show, setShow, list}) => {
                         </tr>
                     </thead>
                     <tbody>
-                        {list && list.userTasks.map(t => {
+                        {list && list.userTasks && list.userTasks.map(t => {
                             return (
                                 <tr key={t.date}>
                                     <td>{t.date}</td>
