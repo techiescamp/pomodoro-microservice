@@ -1,13 +1,14 @@
 import React, { useEffect, useState, createContext, useContext, useCallback, useMemo } from 'react'
 import axios from 'axios';
-import { MyContext } from '../Timer';
-import clickSound from '../../../assets/audio/Mouse_Click.mp3';
-import clockAlarm from '../../../assets/audio/clock-alarm.mp3';
-import '../Timer.css';
-import config from '../../../config';
-import TimerNav from './TimerNav';
-import TimerButtons from './TimerButtons';
-import { UserContext } from '../../../App';
+import { MyContext } from './Timer';
+import clickSound from '../../assets/audio/Mouse_Click.mp3';
+import clockAlarm from '../../assets/audio/clock-alarm.mp3';
+import './Timer.css';
+import config from '../../config';
+import TimerNavbar from '../../components/Timer/TimrNavbar';
+import TimerButtons from '../../components/Timer/TimerButtons';
+import { UserContext } from '../../App';
+
 
 export const MyTimerContext = createContext();
 const apiUrl = config.apiUrl
@@ -17,6 +18,7 @@ const TimerUI = ({ finish, setFinish }) => {
     const { user, xCorrId } = useContext(UserContext);
     const { todo, setTodo } = useContext(MyContext);
     const [message, setMessage] = useState(null);
+    const { setBg } = useContext(MyContext) // navbar
     
     let customTimer = sessionStorage.getItem('customTimer') ? JSON.parse(sessionStorage.getItem('customTimer')) : null;
 
@@ -164,14 +166,14 @@ const TimerUI = ({ finish, setFinish }) => {
                     </div>
                 }
                 {/* timer navigation buttons */}
-                <TimerNav />
+                <TimerNavbar setBg={setBg} setTimer={setTimer} setTimerName={setTimerName} setIsActive={setIsActive} customTimer={customTimer} />
 
                 {/* Display timer */}
                 <h1 className='m-4 text-white fw-semibold' id='timer-display'>
                     {formatTime(timer)}
                 </h1>
                 
-                <TimerButtons handleStart={handleStart} handleStop={handleStop} />
+                <TimerButtons isActive={isActive} handleStart={handleStart} handleStop={handleStop} />
             </div>
         </MyTimerContext.Provider>
     )

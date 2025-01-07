@@ -7,7 +7,6 @@ import { UserContext } from '../../App';
 const apiUrl = config.apiUrl;
 
 const Login = () => {
-    console.log(apiUrl);
     const { xCorrId } = useContext(UserContext)
     const navigate = useNavigate();
 

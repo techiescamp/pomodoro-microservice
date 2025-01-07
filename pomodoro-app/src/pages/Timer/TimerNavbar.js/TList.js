@@ -60,7 +60,7 @@ const TList = ({user, show, setShow, list}) => {
                             return (
                                 <tr key={t.date}>
                                     <td>{t.date}</td>
-                                    <td>
+                                    <td className='bottom-line'>
                                         <ul style={{listStyle: 'none', padding: 0}}>
                                             {t.tasks.map(task => {
                                                 return (
@@ -69,7 +69,7 @@ const TList = ({user, show, setShow, list}) => {
                                             })}
                                         </ul>
                                     </td>
-                                    <td>
+                                    <td className='bottom-line'>
                                         <ul style={{listStyle: 'none', padding: 0}}>
                                             {t.tasks.map(task => {
                                                 return (
@@ -78,7 +78,7 @@ const TList = ({user, show, setShow, list}) => {
                                             })}
                                         </ul>
                                     </td>
-                                    <td>
+                                    <td className='bottom-line'>
                                         <ul style={{listStyle: 'none'}}>
                                             {t.tasks.map(task => {
                                                 return (
@@ -87,7 +87,7 @@ const TList = ({user, show, setShow, list}) => {
                                             })}
                                         </ul>
                                     </td>
-                                    <td>
+                                    <td className='bottom-line'>
                                         <ul style={{listStyle: 'none'}}>
                                             {t.tasks.map(task => {
                                                 return (
@@ -98,7 +98,6 @@ const TList = ({user, show, setShow, list}) => {
                                     </td>
                                 </tr>
                             )
-
                         })}
                     </tbody>
                 </Table>

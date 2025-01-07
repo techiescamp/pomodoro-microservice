@@ -62,9 +62,10 @@ const signup = async (req, res) => {
 
     try {
         const queryStartTime = process.hrtime();
-        const exisitngUser = await User.findOne({ email: req.body.email });
-        
-        if(exisitngUser) {
+        const existingUser = await User.findOne({ email: req.body.email });
+        //
+        console.log(existingUser)
+        if(existingUser) {
             return res.status(400).json({
                 message: "User already registered",
                 success: "warning"
@@ -90,7 +91,7 @@ const signup = async (req, res) => {
         //
         const queryEndTime = process.hrtime(queryStartTime);
         const queryDuration = queryEndTime[0] * 1e9 + queryEndTime[1];
-        metrics.databaseQueryDurationHistogram.observe({operation: 'new user - findOne', success: exisitngUser ? 'false': 'true'}, queryDuration / 1e9);
+        metrics.databaseQueryDurationHistogram.observe({operation: 'new user - findOne', success: existingUser ? 'false': 'true'}, queryDuration / 1e9);
         
         //
         const logResult = {

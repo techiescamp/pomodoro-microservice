@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import './Header.css';
 import { UserContext } from '../../App';
@@ -10,12 +10,14 @@ function Header() {
   const loc = useLocation();
 
   const { user, setUser, xCorrId } = useContext(UserContext);
+  const [isAdmin, setIsAdmin] = useState(false)
   const usersession = JSON.parse(sessionStorage.getItem('userInfo')) || null;
 
   useEffect(() => {
     const getUser = async () => {
       if(usersession) {
         setUser(usersession)
+        if(usersession.email === 'admin@crunchops.com') setIsAdmin(true)
       } else {
         setUser(null)
       }
@@ -64,6 +66,14 @@ function Header() {
                         <p className='mb-0'>#{user.email}</p>
                       </Link>
                     </li>
+                    {/* render document page if user is 'Admin' */}
+                    {isAdmin && 
+                      <li className='dropdown-item mb-1 py-2'>
+                        <Link to={`/${user.displayName}/document`} className="text-decoration-none text-black">
+                          <i className="bi bi-person-circle me-3"></i>Tech Document
+                        </Link>
+                      </li>
+                    }
                     <li className='dropdown-item mb-1 py-2'>
                       <Link to={`/${user.displayName}/settings`} className="text-decoration-none text-black">
                         <i className="bi bi-person-circle me-3"></i>Settings

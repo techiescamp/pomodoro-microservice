@@ -1,8 +1,8 @@
 import React, { useState, createContext, useEffect, useContext } from 'react';
-import TaskUI from './Tasks_UI/TaskUI';
+import TaskUI from './TaskUI';
 import TNavbar from './TimerNavbar.js/TNavbar';
 import TimerContent from './TimerContent';
-import TimerUI from './Timer_UI/TimerUI';
+import TimerUI from './TimerUI';
 import Dropdown from 'react-bootstrap/Dropdown';
 import { UserContext } from '../../App';
 import './Timer.css';

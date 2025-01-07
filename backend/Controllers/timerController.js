@@ -104,14 +104,14 @@ const createTask = async (req, res) => {
             const oldT = existingUser.userTasks.findIndex(t => t.date === req.body.date)
             // if new date
             if (oldT === -1) {
-                const oldTask = existingUser.userTasks.map(t => t)
                 const newTask = {
                     date: req.body.date,
                     tasks: [...req.body.userTasks]
                 }
                 existingUser.userTasks.push(newTask)
             } else {
-                // if same date or date is found
+                // if same date or date is found'
+                
                 const task = existingUser.userTasks[oldT].tasks;
                 task.push(...payload.userTasks[0].tasks);
                 const uniqueTasks = task.filter((obj, index) => index === task.findIndex(o => o.id === obj.id))
@@ -137,7 +137,7 @@ const createTask = async (req, res) => {
     }
     catch (err) {
         span.addEvent('Error during creating tasks', { 'error': err.message });
-        logger.format(req, res);
+        logger.info(req, res);
         metrics.errorCounter.inc();
         span.setAttribute('error', true); // Mark this span as an error
         span.end();

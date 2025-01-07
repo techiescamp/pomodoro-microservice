@@ -37,7 +37,7 @@ const TReport = ({ report, setReport, list }) => {
                 }
                 return {
                     act: total,
-                    month: i.date.split('/')[0]
+                    month: i.date && i.date.split('/')[0]
                 }
             })
             const r = month.map((m, index) => {

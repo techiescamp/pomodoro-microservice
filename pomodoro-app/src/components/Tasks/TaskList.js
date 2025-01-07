@@ -2,7 +2,6 @@ import React from 'react'
 import ListGroup from 'react-bootstrap/ListGroup';
 import Dropdown from 'react-bootstrap/Dropdown';
 import Form from 'react-bootstrap/Form';
-import '../Timer.css';
 
 const TaskList = ({ todo, setTodo, handleEdit }) => {
     const handleChecked = (id) => {
