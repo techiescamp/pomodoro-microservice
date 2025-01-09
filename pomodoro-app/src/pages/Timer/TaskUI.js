@@ -1,11 +1,13 @@
 import React, { useState, useContext } from 'react'
-import TaskForm from './TaskForm';
-import TaskList from './TaskList';
-import { MyContext } from '../Timer';
-import '../Timer.css';
+import TaskForm from '../../components/Tasks/TaskForm';
+import TaskList from '../../components/Tasks/TaskList';
+import { MyContext } from './Timer';
+import { UserContext } from '../../App';
+import './Timer.css';
 
 const TaskUI = () => {
     const { todo, setTodo } = useContext(MyContext);
+    const { user, xCorrId } = useContext(UserContext);
 
     const [isUpdate, setIsUpdate] = useState(false);
     const [form, setForm] = useState({
@@ -43,6 +45,10 @@ const TaskUI = () => {
                 handleEdit={(id) => handleEdit(id)}
             />
             <TaskForm 
+                todo={todo}
+                setTodo={setTodo}
+                user={user}
+                xCorrId={xCorrId}
                 form={form}
                 setForm={setForm}
                 isUpdate={isUpdate}

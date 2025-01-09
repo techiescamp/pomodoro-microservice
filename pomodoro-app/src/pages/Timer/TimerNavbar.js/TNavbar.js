@@ -22,7 +22,7 @@ const TNavbar = () => {
     // report modal
     const [report, setReport] = useState(false)
     const handleReport = () => setReport(true);
-    console.log(user)
+
     useEffect(() => {
         if (user) {
             axios.post(`${apiUrl}/reportService`, user, {
@@ -38,7 +38,7 @@ const TNavbar = () => {
                 }
             })
         }
-    },[user, count])
+    },[user, count, xCorrId])
 
     return (
         <div className='mb-5'>

@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import Button from 'react-bootstrap/Button';
 import Collapse from 'react-bootstrap/Collapse';
-import '../Timer.css';
 
 const TaskButtons = ({ form, isUpdate, handleChange, handleEditInputChange }) => {
     const [noteOpen, setNoteOpen] = useState(false);

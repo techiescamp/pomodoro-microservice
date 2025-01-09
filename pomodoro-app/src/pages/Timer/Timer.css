@@ -131,6 +131,10 @@
     color: white;
   }
 
+  .bottom-line > ul > li {
+    padding-bottom: 10px;
+  }
+
 
   /* TContent */
   .pomo-title {

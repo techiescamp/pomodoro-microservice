@@ -1,17 +1,12 @@
-import React, { useContext, useEffect } from 'react'
-import { MyContext } from '../Timer';
+import React, { useEffect } from 'react'
 import TaskButtons from './TaskButtons';
-import '../Timer.css';
-import config from '../../../config';
+import config from '../../config';
 import axios from 'axios';
-import { UserContext } from '../../../App';
 
 const apiUrl = config.apiUrl;
 const metrics_url = config.metrics_url;
 
-const TaskForm = ({ form, setForm, isUpdate, setIsUpdate }) => {
-    const { todo, setTodo } = useContext(MyContext);
-    const { user, xCorrId } = useContext(UserContext);
+const TaskForm = ({ todo, setTodo, user, xCorrId, form, setForm, isUpdate, setIsUpdate }) => {
     
     const todayDate = JSON.parse(sessionStorage.getItem('date'));
     const checkedTasks = sessionStorage.getItem('checkedTasks') ? 
@@ -20,7 +15,6 @@ const TaskForm = ({ form, setForm, isUpdate, setIsUpdate }) => {
     const todaysTask = sessionStorage.getItem('todaysTask') ? 
             JSON.parse(sessionStorage.getItem('todaysTask')) 
             : []
-
 
     useEffect(() => {
          // if user logged again today ? integrate old tasks to today's tasks 
@@ -52,7 +46,7 @@ const TaskForm = ({ form, setForm, isUpdate, setIsUpdate }) => {
         return `T${timestamp + randString}`
     }
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async(e) => {
         e.preventDefault();
         if (todo) {
             const newTodo = {
@@ -60,7 +54,16 @@ const TaskForm = ({ form, setForm, isUpdate, setIsUpdate }) => {
                 id: generateUniqueId(), // Assigning sequential id based on the length of the todo array
             };
             setTodo(todo ? [...todo, newTodo] : [newTodo]);
-            sessionStorage.setItem('todo', JSON.stringify(todo ? [...todo, newTodo] : [newTodo]));
+            //  ---------------------- create task in database..........
+            const todoTask = todo ? [...todo, newTodo] : [newTodo]
+            const payload = {
+                date: JSON.parse(sessionStorage.getItem('date')),
+                userData: user,
+                userTasks: todoTask
+            }
+            const response = await axios.post(`${apiUrl}/createTask`, payload)
+            console.log(response.data) //
+            sessionStorage.setItem('todo', JSON.stringify(todoTask));
         }
         setForm({
             title: '',

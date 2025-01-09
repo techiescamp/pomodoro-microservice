@@ -1,14 +1,7 @@
-import React, { useContext } from 'react'
-import { MyContext } from '../Timer';
+import React from 'react'
 import Nav from 'react-bootstrap/Nav';
-import { MyTimerContext } from './TimerUI';
 
-
-const TimerNav = () => {
-    const { setBg } = useContext(MyContext)
-    const { setTimer, setIsActive, setTimerName } = useContext(MyTimerContext);
-
-    let customTimer =  sessionStorage.getItem('customTimer') ? JSON.parse(sessionStorage.getItem('customTimer')) : null;
+const TimerNavbar = ({ setBg, setTimer, setIsActive, setTimerName, customTimer }) => {
 
     const handleSelect = (eventKey) => {
         switch(eventKey) {
@@ -55,4 +48,4 @@ const TimerNav = () => {
     )
 }
 
-export default TimerNav
+export default TimerNavbar

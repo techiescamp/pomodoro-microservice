@@ -2,7 +2,6 @@ import React from 'react'
 import ListGroup from 'react-bootstrap/ListGroup';
 import Dropdown from 'react-bootstrap/Dropdown';
 import Form from 'react-bootstrap/Form';
-import '../Timer.css';
 
 const TaskList = ({ todo, setTodo, handleEdit }) => {
     const handleChecked = (id) => {
@@ -18,7 +17,7 @@ const TaskList = ({ todo, setTodo, handleEdit }) => {
 
     return (
         <ListGroup>
-            {todo ? todo.map(item => {
+            {todo && todo.map(item => {
                 return (
                 <ListGroup.Item key={item.id} className='mb-2 align-items-center'>
                     <Dropdown id='dropdown-task'>
@@ -57,7 +56,7 @@ const TaskList = ({ todo, setTodo, handleEdit }) => {
                     }
                 </ListGroup.Item>
                 )
-             }) : null }
+             })}
         </ListGroup>
     )
 }

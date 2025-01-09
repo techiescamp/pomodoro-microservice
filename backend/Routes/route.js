@@ -1,10 +1,14 @@
 const express = require('express');
 
-const { checkTodayTasks, createTask, reportService } = require('../Controllers/timerController');
+const { getTasks, checkTodayTasks, createTask, reportService } = require('../Controllers/timerController');
 const { signup, login, verifyUser, updateUser, logout } = require('../Controllers/userController');
 const { sendMails, subscribe } = require('../Controllers/mailController');
 
 const route = express.Router();
+
+// tasks
+route.post('/getTasks', getTasks)
+
 
 // timer route
 route.post('/checkTodayTasks', checkTodayTasks)

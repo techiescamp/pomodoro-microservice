@@ -1,9 +1,6 @@
-import React, { useContext } from 'react'
-import { MyTimerContext } from './TimerUI'
+import React from 'react'
 
-const TimerButtons = ({ handleStart, handleStop }) => {
-    const { isActive } = useContext(MyTimerContext);
-
+const TimerButtons = ({ isActive, handleStart, handleStop }) => {
     return (
         <>
             <button className='btn btn-light fw-bold px-4' style={{ color: 'inherit' }} onClick={handleStart}>
