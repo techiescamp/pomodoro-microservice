@@ -1,27 +1,27 @@
 const express = require('express');
 
-const { getTasks, checkTodayTasks, createTask, reportService } = require('../Controllers/timerController');
-const { signup, login, verifyUser, updateUser, logout } = require('../Controllers/userController');
+const { addTask, getTasks, getAllTasks, updateTask, editData, deleteTask } = require('../Controllers/timerController')
+const { signup, login, isUserVerified, updateUser, logout } = require('../Controllers/userController');
 const { sendMails, subscribe } = require('../Controllers/mailController');
+const verifyUser = require('../middlewares/authentication');
 
 const route = express.Router();
 
-// tasks
-route.post('/getTasks', getTasks)
+//
+route.post('/api/addTask', verifyUser, addTask)
+route.get('/api/getTasks', verifyUser, getTasks)
+route.get('/api/getAllTasks', verifyUser, getAllTasks) // reports microservice
+route.put('/api/updateTask/:id', verifyUser, updateTask)
+route.put('/api/editData/:id', verifyUser, editData)
+route.delete('/api/deleteTask/:id', verifyUser, deleteTask)
 
 
-// timer route
-route.post('/checkTodayTasks', checkTodayTasks)
-route.post('/createTask', createTask);
-route.post('/reportService', reportService)
-
-
-// user routes
-route.post('/user/signup', signup);
-route.post('/user/login', login);
-route.post('/user/verifyUser', verifyUser);
-route.post('/user/updateUser', updateUser);
-route.get('/user/logout', logout);
+// auth routes
+route.post('/auth/signup', signup);
+route.post('/auth/login', login);
+route.get('/auth/verify-user', verifyUser, isUserVerified)
+route.post('/auth/update-user', verifyUser, updateUser);
+route.get('/auth/logout', verifyUser, logout);
 
 // mail routes for subscriptions
 route.post('/subscribe', subscribe);
