@@ -1,193 +1,350 @@
-const axios = require('axios');
-const logger = require('../Observability/logger');
-const logFormat = require('../Observability/logFormat');
-const TaskTracker = require('../Model/timerModel');
-const { tracer } = require('../Observability/jaegerTrace');
-const metrics = require('../Observability/metrics');
+const TaskTracker = require('../Model/timerModel')
+//
+const logger = require('../Observability/logger')
+const logFormat = require('../Observability/logFormat')
+const { tracer } = require('../Observability/jaegerTrace')
+const metrics = require('../Observability/metrics')
 const { trace, context, propagation } = require('@opentelemetry/api')
-const config = require('../config');
-const reportsUrl = config.urls.reportsUrl;
+const axios = require('axios')
+const config = require('../config')
+const reportsUrl = config.urls.reportsUrl
+
+const addTask = async (req, res) => {
+  const span = tracer.startSpan('Add new tasks', {
+    attributes: {'x-correlation-id': req.correlationId}
+  })
+  metrics.httpRequestCounter.inc()
+
+  const { addTask } = req.body
+  const user = req.user
+  let doc
+
+  try {
+    const isUserExisted = await TaskTracker.findOne({ "userData.userId": user.userId })
+  
+    if (isUserExisted) {
+      // format date for display
+      isUserExisted.userTasks.forEach(userTask => {
+        userTask.date = new Date(userTask.date).toLocaleDateString()
+      });
+
+      const formattedDate = new Date(addTask.userTasks.date).toLocaleDateString()
+      const checkDate = isUserExisted.userTasks.findIndex(i => new Date(i.date).toLocaleDateString() === formattedDate)
+      // new date
+      if (checkDate === -1) {
+        addTask.userTasks.date = formattedDate
+        isUserExisted.userTasks.push(addTask.userTasks)
+
+      } else { // already date existed
+        isUserExisted.userTasks[checkDate].tasks.push(...addTask.userTasks.tasks)
+      }
+      
+      const filter = { 'userData.userId': { $in: [user.userId] } }
+      const options = { new: true, upsert: true }
+      
+      // db mterics
+      const queryStartTime = process.hrtime()
+      doc = await TaskTracker.findOneAndUpdate(filter, isUserExisted, options)
+      //
+      const queryEndTime = process.hrtime(queryStartTime)
+      const queryDuration = queryEndTime[0]*1e9 + queryEndTime[1]
+      metrics.databaseQueryDurationHistogram.observe({operation: 'findone - user added tasks', success: isUserExisted ? 'true' : 'false'}, queryDuration)
+    } 
+    else {
+      const payload = addTask
+      payload.userTasks.date = new Date(payload.userTasks.date).toLocaleDateString()
+      
+      // db mterics
+      const queryStartTime = process.hrtime()
+      doc = new TaskTracker(payload)
+      //
+      const queryEndTime = process.hrtime(queryStartTime)
+      const queryDuration = queryEndTime[0]*1e9 + queryEndTime[1]
+      metrics.databaseQueryDurationHistogram.observe({operation: 'findone - user added tasks', success: isUserExisted ? 'true' : 'false'}, queryDuration)
+    }
+    // log
+    const logResult = {
+      emailId: user.email,
+      statusCode: res.statusCode
+    }
+    logger.info('add task ', logFormat(req, logResult))
+    span.end()
+    return res.status(200).send(doc)
+  }
+  catch(err) {
+    metrics.errorCounter.inc()
+    span.setTag('error', true)
+    span.log({ event: 'error', message: 'Error to add task at backend'})
+    span.end()
+    return res.status(500).send({message: 'Error at backend to add task', statusCode: 'warning'})
+  }
+
+}
 
 const getTasks = async (req, res) => {
-    try {
-        const getTaskList = await TaskTracker.find({ "userData.email": req.body.email }, { _id: 0, "userTasks": 1 });
-        const uncheckedTasks = [];
-
-        // Iterate over the userTasks array and update the tasks
-        getTaskList.forEach(user => {
-            user.userTasks.forEach(taskGroup => {
-                // Get "checked = false" tasks
-                const unTasks = taskGroup.tasks.filter(t => !t.checked);
-                uncheckedTasks.push(...unTasks);
-
-                // Remove unchecked tasks from the original list
-                taskGroup.tasks = taskGroup.tasks.filter(t => t.checked);
-            });
-        });
-
-        // Update the database
-        await TaskTracker.findOneAndUpdate(
-            { "userData.email": req.body.email }, // Filter
-            { $set: { userTasks: getTaskList[0].userTasks } }, // Update data (adjusting for the array structure)
-            { upsert: true, new: true } // Options
-        );
-        res.status(200).send(uncheckedTasks);
-
-    } catch (error) {
-        console.log("Error in getting tasks ", error)
+  const span = tracer.startSpan('Get unchecked task', {
+    attributes: { 'x-correlation-id': req.correlationId }
+  });
+  metrics.httpRequestCounter.inc();
+  
+  const { userId } = req.user
+  try {
+    // db metrics
+    const queryStartTime = process.hrtime();
+    const { userTasks } = await TaskTracker.findOne({ "userData.userId": userId }, { userTasks: 1 })
+    //
+    const queryEndTime = process.hrtime(queryStartTime);
+    const queryDuration = queryEndTime[0] * 1e9 + queryEndTime[1];
+    metrics.databaseQueryDurationHistogram.observe({ operation: 'Fetch unchecked tasks - findOne', success: userTasks ? 'true' : 'false' }, queryDuration / 1e9);
+    // log
+    const logResult = {
+      userId: userId,
+      statusCode: res.statusCode
     }
+    logger.info('Get unchecked task to index page', logFormat(req, logResult))
+
+    const notCheckedTasks = userTasks.map(t => t.tasks.filter(i => !i.checked)).flat()
+    span.end()
+    return res.status(200).send(notCheckedTasks)
+  }
+  catch (err) {
+    metrics.errorCounter.inc()
+    span.setTag('error', true)
+    span.log({ event: 'error', message: 'Error to get unchecked task at backend'})
+    span.end()
+    return res.status(500).json({message: 'Error to get unchecked task at backend', statusCode: 'warning'})
+  }
 }
 
-const checkTodayTasks = async (req, res) => {
-    const span = tracer.startSpan('check today tasks', {
-        attributes: { 'x-correlation-id': req.correlationId }
+const updateTask = async (req, res) => {
+  const span = tracer.startSpan('user completed task', {
+    attributes: { 'x-correlation-id': req.correlationId }
+  });
+  metrics.httpRequestCounter.inc();
+
+  const { userId } = req.user
+  const { id } = req.params
+  const updatedData = req.body
+
+  try {
+    const taskData = await TaskTracker.findOne({
+      'userTasks.tasks.id': id, // Match the specific task by its ID
     });
-    metrics.httpRequestCounter.inc();
 
-    const presentDate = new Date().toLocaleString('en-US').split(", ")[0]
-    if (presentDate === req.body.date) {
-        const queryStartTime = process.hrtime();
-        let existingUser = await TaskTracker.find({ "userTasks.date": req.body.date, "userData.email": req.body.email }, { "userTasks": 1 })
-        //
-        const queryEndTime = process.hrtime(queryStartTime);
-        const queryDuration = queryEndTime[0] * 1e9 + queryEndTime[1];
-        metrics.databaseQueryDurationHistogram.observe({ operation: 'user logged again today - find', success: existingUser ? 'true' : 'false' }, queryDuration / 1e9);
-
-        // Accessing the userTasks array from each document
-        const userTasksArrays = existingUser.map(doc => doc.userTasks);
-        // Flatten the array of arrays into a single array of userTasks objects
-        const allUserTasks = userTasksArrays.flat();
-        // Filtering userTasks objects based on the presentDate
-        const userTasksForPresentDate = allUserTasks.filter(task => task.date === presentDate);
-        res.status(200).send(userTasksForPresentDate[0] ? userTasksForPresentDate[0].tasks : null);
+    if (!taskData) {
+      logger.info('Task not found')
+      return res.status(404).send({ message: 'Task not found' });
     }
+    // db 
+    const queryStartTime = process.hrtime();
+    const updateResult = await TaskTracker.findOneAndUpdate(
+      {
+        'userTasks.tasks.id': id, // Match the specific task by its ID
+      },
+      {
+        $set: {
+          'userTasks.$[].tasks.$[task].checked': updatedData.checked, // Update the `checked` field
+          'userTasks.$[].tasks.$[task].act': updatedData.act,         // Update the `act` field
+          'userTasks.$[].tasks.$[task].timer': updatedData.timer && updatedData.timer.split(':')[0],  // update 'timer' field
+        },
+      },
+      {
+        arrayFilters: [
+          { 'task.id': id }, // Filter to match the specific task ID
+        ],
+        new: true, // Return the updated document
+      }
+    );
+    //
+    const queryEndTime = process.hrtime(queryStartTime);
+    const queryDuration = queryEndTime[0] * 1e9 + queryEndTime[1];
+    metrics.databaseQueryDurationHistogram.observe({ operation: 'Update data task completion - findOneandUpdate', success: updateResult ? 'true' : 'false' }, queryDuration / 1e9);
+          
+    // log
+    const logResult = {
+      userId: userId,
+      statusCode: res.statusCode,
+    }
+    logger.info('Task updated', logFormat(req, logResult));
+    metrics.tasksCompletedCounter.inc();
     span.end();
+
+    return res.status(200).json({info: 'Task is updated successfully!', updateResult});
+  } 
+  catch (err) {
+    metrics.errorCounter.inc()
+    span.setAttribute('error', true)
+    span.log({event: 'error', message: 'Error updating tasks at backend'})
+    span.end()
+    return res.status(500).send('error updating task')
+  }
 }
 
-const createTask = async (req, res) => {
-    const span = tracer.startSpan('create new task', {
-        attributes: { 'x-correlation-id': req.correlationId }
-    });
-    metrics.httpRequestCounter.inc();
+const editData = async (req, res) => {
+  const span = tracer.startSpan('User editing task', {
+    attributes: { 'x-correlation-id': req.correlationId }
+  });
+  metrics.httpRequestCounter.inc();
 
-    try {
-        const queryStartTime = process.hrtime();
-        let existingUser = await TaskTracker.findOne({ "userData.email": req.body.userData.email })
-        //
-        const queryEndTime = process.hrtime(queryStartTime);
-        const queryDuration = queryEndTime[0] * 1e9 + queryEndTime[1];
-        metrics.databaseQueryDurationHistogram.observe({ operation: 'find user - findOne', success: existingUser ? 'true' : 'false' }, queryDuration / 1e9);
+  const { id } = req.params
+  const { userId } = req.user
+  const { updatedTask } = req.body
 
-        var payload = {
-            userData: req.body.userData,
-            userTasks: [{
-                date: req.body.date,
-                tasks: [...req.body.userTasks]
-            }]
+  try {
+    // db metrics
+    const queryStartTime = process.hrtime();
+    const task = await TaskTracker.findOneAndUpdate(
+      { "userData.userId": userId, "userTasks.tasks.id": id },
+      {
+        $set: {
+          "userTasks.$[].tasks.$[task].checked": updatedTask.checked,
+          "userTasks.$[].tasks.$[task].title": updatedTask.title,
+          "userTasks.$[].tasks.$[task].description": updatedTask.description,
+          "userTasks.$[].tasks.$[task].act": updatedTask.act,
+          "userTasks.$[].tasks.$[task].timer": updatedTask.timer,
         }
-        const filter = { 'userData.email': { $in: [req.body.userData.email] } }
-        const options = { new: true, upsert: true }
+      },
+      { arrayFilters: [{ "task.id": id }], new: true }
+    )
+    //
+    const queryEndTime = process.hrtime(queryStartTime);
+    const queryDuration = queryEndTime[0] * 1e9 + queryEndTime[1];
+    metrics.databaseQueryDurationHistogram.observe({ operation: 'Update task - findOneandUpdate', success: task ? 'true' : 'false' }, queryDuration / 1e9);
 
-        // to add new user
-        if (!existingUser) {
-            span.addEvent('new user - new task created');
-            const queryStartTime = process.hrtime();
-            const doc = await TaskTracker.create(payload);
-            doc.save();
-            //
-            const queryEndTime = process.hrtime(queryStartTime);
-            const queryDuration = queryEndTime[0] * 1e9 + queryEndTime[1];
-            metrics.databaseQueryDurationHistogram.observe({ operation: 'create new task - create', success: 'true' }, queryDuration / 1e9);
-        }
-        else {
-            // check whether its an old-date or new date?
-            const oldT = existingUser.userTasks.findIndex(t => t.date === req.body.date)
-            // if new date
-            if (oldT === -1) {
-                const newTask = {
-                    date: req.body.date,
-                    tasks: [...req.body.userTasks]
-                }
-                existingUser.userTasks.push(newTask)
-            } else {
-                // if same date or date is found'
-                
-                const task = existingUser.userTasks[oldT].tasks;
-                task.push(...payload.userTasks[0].tasks);
-                const uniqueTasks = task.filter((obj, index) => index === task.findIndex(o => o.id === obj.id))
-                existingUser.userTasks[oldT].tasks = uniqueTasks;
-            }
-            const queryStartTime = process.hrtime();
-            const doc = await TaskTracker.findOneAndUpdate(filter, existingUser, options);
-            doc.save();
-            //
-            const queryEndTime = process.hrtime(queryStartTime);
-            const queryDuration = queryEndTime[0] * 1e9 + queryEndTime[1];
-            metrics.databaseQueryDurationHistogram.observe({ operation: 'update new task - findOneandUpdate', success: doc ? 'true' : 'false' }, queryDuration / 1e9);
-        }
-        //
-        const logResult = {
-            emailId: req.body.userData.email,
-            statusCode: res.statusCode,
-        }
-        logger.info('Created user-task', logFormat(req, logResult));
-        metrics.tasksCompletedCounter.inc();
-        span.end();
-        return res.status(200).send('Submitted');
+
+    // log
+    const logResult = {
+      userId: userId,
+      statusCode: res.statusCode
     }
-    catch (err) {
-        span.addEvent('Error during creating tasks', { 'error': err.message });
-        logger.info(req, res);
-        metrics.errorCounter.inc();
-        span.setAttribute('error', true); // Mark this span as an error
-        span.end();
-        res.status(400).send('User needs to login to save tasks')
+    if (!task) {
+      // log
+      logger.info('Task not found to edit', logFormat(req, logResult));
+      span.end();
+      return res.status(404).json({ message: 'Task not found or user mismatch' });
     }
+    // log
+    logger.info('Task Edited', logFormat(req, logResult));
+    span.end();
+    return res.status(200).json({ message: 'Task edited successfully', updatedTask: task });
+  }
+  catch (err) {
+    metrics.errorCounter.inc()
+    span.setTag('error', true)
+    span.log({ event: 'error', message: 'Error edit task at backend' })
+    span.end()
+    return res.status(500).json({ message: 'Error editng task', error: err });
+  }
 }
 
-const reportService = async (req, res) => {
-    const user = req.body
-    const span = tracer.startSpan('send new reports from backend-service', {
-        attributes: { 'x-correlation-id': req.correlationId }
-    });
-    metrics.httpRequestCounter.inc()
+const deleteTask = async (req, res) => {
+  const span = tracer.startSpan('Delete task', {
+    attributes: { 'x-correlation-id': req.correlationId }
+  });
+  metrics.httpRequestCounter.inc();
 
-    // set current context with new span
-    const ctx = trace.setSpan(context.active(), span)
+  const { id } = req.params
+  const { userId } = req.user
 
-    try {
-        span.addEvent('Service context Propagating to Reports-Service')
-        // run following code within the context of new span
-        await context.with(ctx, async () => {
-            const headers = {
-                'Content-Type': 'application/json',
-                'x-correlation-id': req.body.xCorrId,
-            }
-            // inject trace context into headers
-            propagation.inject(context.active(), headers);
+  try {
+    // db metrics
+    const queryStartTime = process.hrtime();
+    const result = await TaskTracker.updateOne(
+      { "userData.userId": userId }, // Find the document by userId
+      { $pull: { "userTasks.$[].tasks": { id: id } } } // Pull the task with matching id
+    );
+    //
+    const queryEndTime = process.hrtime(queryStartTime);
+    const queryDuration = queryEndTime[0] * 1e9 + queryEndTime[1];
+    metrics.databaseQueryDurationHistogram.observe({ operation: 'delete task - UpdateOne and pull', success: result ? 'true' : 'false' }, queryDuration / 1e9);
 
-            const result = await axios.post(`${reportsUrl}/tasks`, user, {
-                headers: headers
-            })
-            span.end()
-            if (result.data.task) {
-                return res.status(200).json(result.data.existingUser)
-            } else {
-                return;
-            }
-        })
+    ////
+    const logResult = {
+      userId: userId,
+      statusCode: res.statusCode,
     }
-    catch (err) {
-        logger.error(err);
-        span.setAttribute('error', true); // Mark this span as an error
+    if (result.modifiedCount > 0) {
+      // log
+      logger.info('deleted task', logFormat(req, logResult));
+      span.end();
+      return res.send('Task deleted successfully');
     }
+    else {
+      // log
+      logger.info('task not found to delete', logFormat(req, logResult));
+      span.end();
+      return res.send('Task not found or already deleted');
+    }
+  } catch (err) {
+    metrics.errorCounter.inc()
+    span.setTag('error', true)
+    span.log({ event: 'error', message: 'Error to delete task at backend' })
+    span.end()
+    return res.send('Error deleting task: ', err);
+  }
+}
+
+//  call another service
+const getAllTasks = async (req, res) => {
+  const { userId } = req.user
+
+  const span = tracer.startSpan('get all tasks and send reports to frontend [backend <- reports] microservice', {
+      attributes: { 'x-correlation-id': req.correlationId }
+  });
+  metrics.httpRequestCounter.inc()
+
+  // set current context with new span
+  const ctx = trace.setSpan(context.active(), span)
+  trace.setSpan(context.active(), span)
+
+  try {
+      span.addEvent('Service context Propagating to Reports-Service')
+      // run following code within the context of new span
+      const headers = {
+          'Content-Type': 'application/json',
+          'x-correlation-id': req.correlationId, // req.body.xCorrId
+      }
+      await context.with(ctx, async () => {
+          // inject trace context into headers
+          propagation.inject(context.active(), headers);
+
+          const result = await axios.post(`${reportsUrl}/api2/getAllTasks`, 
+            { userId }, 
+            { headers: headers }
+          ) 
+          const logResult = {
+            userId: req.user.userId,
+            statusCode: res.statusCode
+          }
+          if(result.data.isTaskFetched) {
+            span.addEvent('Fetchedtasks from reports service')
+            logger.info('Fetched tasks from reports service', logFormat(req, logResult))
+            return res.status(200).json(result.data.existingUser)
+          }
+      })
+  }
+  catch (err) {
+      logger.error('Error in reportService', {
+          error: err.message,
+          user: req.body,
+          correlationId: req.correlationId
+      });
+      span.setStatus({code: 2, message: err.message}) // code 2 - error
+      span.setAttribute('error', true); // Mark this span as an error
+      return res.status(500).json({error: 'interal error at "main backend" service'})
+  }
+  finally {
+      span.end()
+  }
 
 }
 
 
 module.exports = {
-    getTasks: getTasks,
-    checkTodayTasks: checkTodayTasks,
-    createTask: createTask,
-    reportService: reportService,
+  addTask,
+  getTasks,
+  getAllTasks,
+  updateTask,
+  editData,
+  deleteTask
 }

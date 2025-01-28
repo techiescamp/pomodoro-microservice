@@ -1,6 +1,6 @@
-import React from 'react';
+import React from 'react'
 
-const TimerContent = () => {
+const PomodoroContent = () => {
     return (
         <div className='container py-3'>
             <h2 className='pomo-title py-md-3 mb-4'>Pomodoro Technique to boost your productivity</h2>
@@ -43,4 +43,4 @@ const TimerContent = () => {
     )
 }
 
-export default TimerContent;
+export default PomodoroContent
