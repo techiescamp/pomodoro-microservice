@@ -1,13 +1,12 @@
-const logFormat = (req, res) => {
+const logFormat = (req, result) => {
     return {
         host: req.headers.host,
+        ipAddress: req.ip,
         method: req.method,
         url: req.url,
         'x-corr-id': req.correlationId,
-        userId: res.userId,
-        emailId: res.emailId,
-        statusCode: res.statusCode,
-        ipAddress: req.ip,
+        userId: result.userId,
+        statusCode: result.statusCode,
     }
 }
 

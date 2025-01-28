@@ -1,8 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const session = require('express-session');
-const passport = require('passport');
 const config = require('./config');
 const route = require('./Routes/route');
 const PORT = config.server.port;
@@ -12,6 +10,9 @@ const responseTime = require('response-time');
 const correlationIdMiddleware = require('./middlewares/correlationid');
 const client = require('prom-client');
 const metrics = require('./Observability/metrics');
+// cron job
+const taskScheduler = require('./cronJobs/taskScheduler');
+
 
 // health check variable
 let isDatabaseReady = false;
@@ -28,20 +29,14 @@ app.use(express.json());
 
 app.use(cors({
   origin: config.urls.baseUrl,
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Accept', 'X-Access-Token', 'X-Correlation-ID', 'Access-Control-Allow-Origin', 'Access-Control-Allow-Credentials'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Accept', 'Authorization', 'X-Correlation-ID', 'Access-Control-Allow-Origin', 'Access-Control-Allow-Credentials'],
   credentials: true
 }));
 
 // log middleware
 app.use(correlationIdMiddleware)
 
-// session middleware
-app.use(session({
-  secret: config.session.secret,
-  resave: false,
-  saveUninitialized: false,
-}));
 
 // http response time for each routes
 app.use(
@@ -186,6 +181,8 @@ app.get('/ready', async (req, res) => {
   }
 });
 
+// initialize cron jobs
+taskScheduler()
 
 app.listen(PORT, (err, client) => {
   if (err) {

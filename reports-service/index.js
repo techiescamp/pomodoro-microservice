@@ -62,11 +62,11 @@ app.get('/metrics', async (req, res) => {
     res.end(await metrics.register.metrics());
 });
 
-app.post('/tasks', async (req, res) => {
+app.post('/api2/getAllTasks', async (req, res) => {
     // Extract the propagated context from headers
     const parentCtx = propagation.extract(context.active(), req.headers)
 
-    const span = tracer.startSpan('User task list', {
+    const span = tracer.startSpan('Reports microservice - Get all user tasks', {
         attributes: { 'x-correlation-id': req.correlationId }
     }, parentCtx);
 
@@ -74,45 +74,48 @@ app.post('/tasks', async (req, res) => {
     const ctx = trace.setSpan(context.active(), span)
 
     metrics.httpRequestCounter.inc();
-    const queryStartTime = process.hrtime();
-    const existingUser = await TaskTracker.findOne({ "userData.email": req.body.email })
-    const queryEndTime = process.hrtime(queryStartTime);
-    const queryDuration = queryEndTime[0] * 1e9 + queryEndTime[1];            
-    metrics.databaseQueryDurationHistogram.observe({operation: 'Task list - findOne', success: existingUser ? 'true': 'false'}, queryDuration / 1e9);
-    
     try {
-        console.log(`report-user: ${existingUser}`)
+        // db metrics
+        const queryStartTime = process.hrtime();
+        const existingUser = await TaskTracker.findOne({ "userData.userId": req.body.userId }, { "_id": 0, "userTasks": 1 })
+        //
+        const queryEndTime = process.hrtime(queryStartTime);
+        const queryDuration = queryEndTime[0] * 1e9 + queryEndTime[1];            
+        metrics.databaseQueryDurationHistogram.observe({operation: 'Reports Service -> Get Tasks - findOne', success: existingUser ? 'true': 'false'}, queryDuration / 1e9);
+    
+        //
+        const logResult = {
+            xCorrId: req.headers['x-correlation-id'],
+            userId: req.body? req.body.userId : null,
+            statusCode: res.statusCode,
+        }
+
         if(existingUser) {        
             // run following code within context of new span
             await context.with(ctx, async() => {      
-                span.addEvent('user task list sent to browser', {requestBody: req.body.email})
-                const logResult = {
-                    userId: req.body? req.body.userId : null,
-                    emailId: req.body? req.body.email : null,
-                    statusCode: res.statusCode,
-                }
-                logger.info('sent task-list to browser', logFormat(req, logResult));
-                span.end();
-                return res.status(200).json({task: true, existingUser: existingUser})
+                span.addEvent('user task list sent to browser', {requestBody: req.body.userId})
+                logger.info('get all tasks are sent to backend service', logFormat(req, logResult));
+                return res.status(200).json({isTaskFetched: true, existingUser: existingUser})
             })
         }
         else {
-            span.addEvent('New user - Task needs to be created');
-            const logResult = {
-                userId: req.body? req.body.userId : null,
-                emailId: req.body? req.body.email : null,
-                statusCode: res.statusCode,
-            }
-            logger.info('New user. So no tsklist :(', logFormat(req, logResult))
-            span.end()
-            return res.status(200).json({task: false, existingUser: req.body});
+            span.addEvent('New user - Task needs to be created - error at reports service');
+            logger.info('New user. So no tsklist :( Error at reports service', logFormat(req, logResult))
+            return res.status(200).json({isTaskFetched: false, existingUser: req.body});
         }
     } catch(err) {
-        logger.error(err);
-        span.setAttribute('error', true); // Mark this span as an error
+        metrics.errorCounter.inc()
+        span.setAttribute('error', true)
+        span.log({ event: 'error', message: 'Error to fetch task at backend'})
+        logger.error('Error in fetching tasks in reports service', err);
+        return res.status(500).json({existingUser: 'Error in fetching all tasks', task: false})
+    }
+    finally {
+        span.end()
     }
 });
 
+  
 app.listen(port, async (err, server) => {
     if(err) return console.log('server is not running');
     logger.info(`server is running at port: ${port}`);

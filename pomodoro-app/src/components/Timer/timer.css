@@ -1,0 +1,29 @@
+
+/* timer navigation */
+#timer-nav {
+    font-weight: 600;
+    background-color: rgba(0, 0, 0, 0.2) !important;
+}
+
+#timer-nav .nav-pills .active {
+    background-color: rgba(0, 0, 0, 0.6);
+    padding: 2px 25px;
+}
+
+.timer-pill {
+    list-style: none;
+    padding: 5px 0;
+}
+
+.timer-pill.nav-pills .nav-link:hover {
+    color: yellow !important;
+}
+
+.tab-pane {
+    font-size: 5em;
+}
+
+/* task form */
+#taskform {
+    display: none;
+}

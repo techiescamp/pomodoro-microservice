@@ -1,13 +1,13 @@
-import React, { useContext, useState } from 'react'
+import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import config from '../../config';
-import { UserContext } from '../../App';
+import config from '../config';
+import { useAuth } from '../context/AuthContext';
 
 const apiUrl = config.apiUrl;
 
 const Login = () => {
-    const { xCorrId } = useContext(UserContext)
+    const { login, xCorrId } = useAuth()
     const navigate = useNavigate();
 
     const [status, setStatus] = useState(null);
@@ -23,52 +23,27 @@ const Login = () => {
         })
     }
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         const cid = xCorrId || `pomo-${Math.ceil(Math.random()*1000)}`;
-        console.log(`${apiUrl}/user/login`)
-        axios.post(`${apiUrl}/user/login`, userLogin, {
-            headers: {
-                'x-correlation-id': cid
+        try {
+            const response = await axios.post(`${apiUrl}/auth/login`, { userLogin }, {
+                headers: { 'x-correlation-id': cid }
+            })
+            setStatus({message: response.data.message, statusCode: response.data.status})
+            if(response.data.token) {
+                login(response.data.user, response.data.token)
             }
-        })
-        .then(res => {
-            axios.post(`${apiUrl}/user/verifyUser`, res.data, {
-                headers: {
-                    'x-correlation-id': cid,
-                    'x-access-token': res.data.token
-                }
-            })
-            .then(res => {
-                setStatus(res.data)
-                sessionStorage.setItem('userInfo', JSON.stringify(res.data))
-                navigate('/')
-            })
-            .catch(err => {
-                console.log(err);
-                if (err.response && err.response.status === 403) {
-                    setStatus({ message: err.response.data.message });
-                } else {
-                    setStatus({ message: 'Verification failed' });
-                }
+        } catch(err) {
+            console.error('Login failed')
+            setStatus({ message: err.message, statusCode: 'warning' });    
+        } finally {
+            setUserLogin({
+                email: '',
+                password: ''
             });
-        })
-        .catch(err => {
-            // console.log(err.response)
-            if(err.response && err.response.status === 401) {
-                setStatus({message: err.response.data.message})
-            } else if(err.response && err.response.status === 402) {
-                setStatus({message: err.response.data.message})
-            } else if(err.code === 'ERR_NETWORK') {
-                setStatus(err.message);
-            } else if(err.code === 'ERR_BAD_REQUEST') {
-                setStatus({message: 'Server is not online'})
-            }
-        })
-        setUserLogin({
-            email: '',
-            password: ''
-        });
+            navigate('/')
+        }
     }
 
     const inlineStyle = {
@@ -83,8 +58,8 @@ const Login = () => {
                 <div className='form-wrapper mx-auto border border-outline-secondary p-2 bg-light'>
                     <h3 className='m-3'>LOGIN FORM</h3>
                     {status ? 
-                        <p style={inlineStyle} className={status.success ? 'text-success' : 'text-danger'}>
-                            {status.message ? status.message : status}</p> 
+                        <p style={inlineStyle} className={status.statusCode === 'success' ? 'text-success' : 'text-danger'}>
+                            {status.message && status.message}</p> 
                     : null
                     }
 
@@ -95,6 +70,7 @@ const Login = () => {
                                 name='email'
                                 value={userLogin.email}
                                 onChange={handleChange}
+                                autoComplete='current-email'
                                 className='form-control mb-3 border border-secondary rounded-1'
                                 placeholder='Enter your email'
                                 required
@@ -106,6 +82,7 @@ const Login = () => {
                                 onChange={handleChange}
                                 className='form-control mb-3 border border-secondary rounded-1'
                                 placeholder='Enter your password'
+                                autoComplete="current-password"
                                 required
                             />
                             <button className='btn btn-primary w-100'>Continue</button>
