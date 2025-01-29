@@ -41,26 +41,35 @@ const TaskForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    const addTask = {
-      userData: user,
-      userTasks: {
-        date: new Date().toLocaleDateString(),
-        tasks: [todo]
-      }
-    }
-    const resp = await axios.post('http://localhost:7000/api/addTask', { addTask }, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    if (resp.data) {
-      setTodo({
-        id: generateId(),
+    if(!user) {
+      alert("Register or Login to add task in the application")
+      setTodo({ 
+        ...todo,
         title: '',
         description: '',
-        act: 1,
-        timer: Number(timer),
-        checked: false
       })
-      setIsTodo(prev => prev + 1)
+    } else {
+      const addTask = {
+        userData: user,
+        userTasks: {
+          date: new Date().toLocaleDateString(),
+          tasks: [todo]
+        }
+      }
+      const resp = await axios.post('http://localhost:7000/api/addTask', { addTask }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (resp.data) {
+        setTodo({
+          id: generateId(),
+          title: '',
+          description: '',
+          act: 1,
+          timer: Number(timer),
+          checked: false
+        })
+        setIsTodo(prev => prev + 1)
+      }
     }
   }
 

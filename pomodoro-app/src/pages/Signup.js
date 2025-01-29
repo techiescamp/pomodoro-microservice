@@ -28,7 +28,6 @@ const Signup = () => {
             const response = await axios.post(`${apiUrl}/auth/signup`, { register }, {
                 headers: { 'x-correlation-id': cid }
             })
-            console.log('user signed in: ', response.data)
             setStatus({message: response.data.message, statusCode: response.data.status})
         } catch(err) {
             console.error('signup failed ', err)
@@ -48,7 +47,7 @@ const Signup = () => {
         padding: '5px'
     }
     function getColor() {
-        if (status.statusCode === 'success') {
+        if (status?.statusCode === 'success') {
             return 'green'
         } else {
             return 'red'
@@ -60,7 +59,7 @@ const Signup = () => {
             <div className="form-container mx-auto pt-5">
                 <div className='form-wrapper mx-auto border border-outline-secondary p-2 bg-light'>
                     <h3 className='m-3'>SIGN UP FORM</h3>
-                    {status ? <p style={inlineStyle}>{status.message && status.message} !</p> : null}
+                    {status && <p style={inlineStyle}>{status.message && status.message} !</p>}
 
                     <form onSubmit={handleSubmit}>
                         <div className='w-75 mx-auto'>

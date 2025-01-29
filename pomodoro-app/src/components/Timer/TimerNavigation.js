@@ -29,16 +29,40 @@ const TimerNavigation = () => {
         return timeFormat
     }  
 
+    const getCustomTimer = () => {
+        // try{
+            const customTimer = JSON.parse(sessionStorage.getItem('customTimer'))
+            return customTimer || {
+                timer: 25,
+                short_break: 5,
+                long_break: 15
+            }
+        // } catch(err) {
+        //     console.error("Invalid custom timer format: ", err)
+        //     return {
+        //         timer: 25,
+        //         short_break: 5,
+        //         long_break: 15
+        //     }
+        // }
+    }
+
+    const customTimers = getCustomTimer();
+
     const defaultTimers = {
-        timer: timer,
-        short: 1 * 60,
-        long: 15 * 60 
+        timer: Number(customTimers.timer) * 60,
+        short: Number(customTimers.short_break) * 60,
+        long: Number(customTimers.long_break) * 60 
     }
     const bgColors = { 
         timer: '#b62525', 
         short: '#643A6B', 
         long: '#005B41' 
     }
+
+    useEffect(() => {
+        console.log(timer)
+    },[timer])
 
     const handleTab = (tab) => {
         stopTimer()
@@ -154,7 +178,7 @@ const TimerNavigation = () => {
         <nav id='timer-nav'> 
             <ul className='nav-pills timer-pill d-flex justify-content-center align-items-center' id='pills-tab' role='tablist'>
                   {['timer', 'short', 'long'].map((tab) => (
-                      <li key={`${tab}`} className="nav-item rounded-pill py-1 px-4 me-3" role="presentation">
+                      <li key={`${tab}`} className="nav-item rounded-pill py-1 px-md-4 px-0 me-3" role="presentation">
                           <Link
                               type="button"
                               className={`nav-link ${activeTab === tab ? 'active' : ''}`}

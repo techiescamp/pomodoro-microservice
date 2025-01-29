@@ -52,11 +52,13 @@ const addTask = async (req, res) => {
     } 
     else {
       const payload = addTask
-      payload.userTasks.date = new Date(payload.userTasks.date).toLocaleDateString()
+      // payload.userTasks.date = new Date(payload.userTasks.date).toLocaleDateString()
+      console.log('new user payload: ', payload)
       
       // db mterics
       const queryStartTime = process.hrtime()
       doc = new TaskTracker(payload)
+      doc.save()
       //
       const queryEndTime = process.hrtime(queryStartTime)
       const queryDuration = queryEndTime[0]*1e9 + queryEndTime[1]
@@ -73,8 +75,8 @@ const addTask = async (req, res) => {
   }
   catch(err) {
     metrics.errorCounter.inc()
-    span.setTag('error', true)
-    span.log({ event: 'error', message: 'Error to add task at backend'})
+    span.setAttribute('error', true)
+    span.addEvent({ event: 'error', message: 'Error to add task at backend'})
     span.end()
     return res.status(500).send({message: 'Error at backend to add task', statusCode: 'warning'})
   }
@@ -96,7 +98,10 @@ const getTasks = async (req, res) => {
     const queryEndTime = process.hrtime(queryStartTime);
     const queryDuration = queryEndTime[0] * 1e9 + queryEndTime[1];
     metrics.databaseQueryDurationHistogram.observe({ operation: 'Fetch unchecked tasks - findOne', success: userTasks ? 'true' : 'false' }, queryDuration / 1e9);
-    // log
+    // 
+    if(!userTasks) {
+
+    }
     const logResult = {
       userId: userId,
       statusCode: res.statusCode
@@ -109,8 +114,8 @@ const getTasks = async (req, res) => {
   }
   catch (err) {
     metrics.errorCounter.inc()
-    span.setTag('error', true)
-    span.log({ event: 'error', message: 'Error to get unchecked task at backend'})
+    span.setAttribute('error', true)
+    span.addEvent({ event: 'error', message: 'Error to get unchecked task at backend'})
     span.end()
     return res.status(500).json({message: 'Error to get unchecked task at backend', statusCode: 'warning'})
   }
@@ -174,7 +179,7 @@ const updateTask = async (req, res) => {
   catch (err) {
     metrics.errorCounter.inc()
     span.setAttribute('error', true)
-    span.log({event: 'error', message: 'Error updating tasks at backend'})
+    span.addEvent({event: 'error', message: 'Error updating tasks at backend'})
     span.end()
     return res.status(500).send('error updating task')
   }
@@ -230,8 +235,8 @@ const editData = async (req, res) => {
   }
   catch (err) {
     metrics.errorCounter.inc()
-    span.setTag('error', true)
-    span.log({ event: 'error', message: 'Error edit task at backend' })
+    span.setAttribute('error', true)
+    span.addEvent({ event: 'error', message: 'Error edit task at backend' })
     span.end()
     return res.status(500).json({ message: 'Error editng task', error: err });
   }
@@ -277,8 +282,8 @@ const deleteTask = async (req, res) => {
     }
   } catch (err) {
     metrics.errorCounter.inc()
-    span.setTag('error', true)
-    span.log({ event: 'error', message: 'Error to delete task at backend' })
+    span.setAttribute('error', true)
+    span.addEvent({ event: 'error', message: 'Error to delete task at backend' })
     span.end()
     return res.send('Error deleting task: ', err);
   }

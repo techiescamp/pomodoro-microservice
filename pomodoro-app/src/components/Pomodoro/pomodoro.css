@@ -33,10 +33,13 @@
 
 @media screen and (max-width: 767px) {
     .pomo-title {
-        font-size: 1.3rem;
-      }
-      .pomo-content {
-        font-size: 1rem;
-      }
+      font-size: 1.3rem;
+    }
+    .pomo-content {
+      font-size: 1rem;
+    }
+    .timerApp {
+      width: 85% !important;
+    }
     
 }
