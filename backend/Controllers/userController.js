@@ -70,7 +70,7 @@ const signup = async (req, res) => {
     if(exisitngUser) {
         return res.status(400).json({
             message: "User already registered",
-            success: "warning"
+            status: "warning"
         })
     }
 
@@ -95,7 +95,7 @@ const signup = async (req, res) => {
         return res.status(200).json({
             message: "Registered Successfully",
             xCorrId: req.headers['x-correlation-id'],
-            statusCode: 'success'
+            status: 'success'
         })
     } catch (err) {
         span.addEvent('Catch Error during registration', { 'error': err.message });
@@ -161,7 +161,6 @@ const login = async (req, res) => {
                 logger.info('user logged in info is passed to server', logFormat(req, logResult))
                 span.end();
 
-                console.log('logged in !!')
                 return res.status(200).json({
                     message: 'user login success',
                     token: user_token,

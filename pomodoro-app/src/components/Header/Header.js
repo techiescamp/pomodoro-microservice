@@ -15,7 +15,7 @@ function Header() {
   const logout = () => {
     if (user) {
       setIsTodo(0);
-      sessionStorage.removeItem('token');
+      sessionStorage.clear()
       setUser(null); // Properly updates the user state
       clearTasks();
       navigate('/');
@@ -23,8 +23,6 @@ function Header() {
       console.error('setUser is not defined');
     }
   }
-
-  
 
 
   return (
