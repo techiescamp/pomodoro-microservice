@@ -12,6 +12,10 @@
   background-color: rgba(15, 72, 113, 0.4);
 }
 
+#tableList {
+  min-height: 70vh;
+}
+
 #tableList td,  #tableList th {
     border: 0.0625rem solid #ddd;
     padding: 0.75rem;

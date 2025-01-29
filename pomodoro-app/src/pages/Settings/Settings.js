@@ -11,8 +11,8 @@ const Settings = () => {
     const token = sessionStorage.getItem('token')
 
     const [profile, setProfile] = useState({
-        displayName: user && user.displayName || '',
-        email: user && user.email || '',
+        displayName: (user && user.displayName) || '',
+        email: (user && user.email) || '',
         password: '',
         msg: ''
     })
