@@ -6,53 +6,9 @@ const logger = require('../Observability/logger');
 const logFormat = require('../Observability/logFormat');
 const { tracer } = require('../Observability/jaegerTrace');
 const metrics = require('../Observability/metrics');
- 
-// for dau
-let activeUser = new Set();
-
-const storeActiveUsers = (userId) => {
-    if(userId) {
-        activeUser.add(userId);
-        // set activeuser gauge
-        metrics.activeUsersGauge.set(activeUser.size);
-    } else {
-        res.status(400).send('user ID required')
-    }
-    const resetActiveUser = () => {
-        activeUser = new Set();
-        metrics.activeUsersGauge.set(0)
-    }
-    const scheduleDailyReset = () => {
-        const now = new Date();
-        const midnight = new Date(
-            now.getFullYear(),
-            now.getMonth(),
-            now.getDate() + 1,
-            0, 0, 0, 0
-        );
-        const timeLeft = midnight - now;
-        setTimeout(() => {
-            resetActiveUser();
-            scheduleDailyReset();
-        }, timeLeft)
-    }
-    scheduleDailyReset();
-    return activeUser
-}
-
-// unique user-id
-async function generateUserId(name) {
-    const uid = `POMO-${Math.ceil(Math.random()*2000)}-${name}`;
-    const checkUser = Boolean(await User.findOne({userId: uid}));
-
-    if(uid === checkUser.userId) {
-        return generateUserId(name);
-    }
-    return uid;
-}
+const { isDisposable, generateUserId, storeActiveUsers } = require('../utils')
 
 const signup = async (req, res) => {
-    //
     const span = tracer.startSpan('Signup', {
         attributes: { 'x-correlation-id': req.correlationId }
     });
@@ -60,54 +16,62 @@ const signup = async (req, res) => {
     metrics.httpRequestCounter.inc();
     const { register } = req.body
 
-    const queryStartTime = process.hrtime();
-    const exisitngUser = await User.findOne({ email: req.body.email });
-        //
-    const queryEndTime = process.hrtime(queryStartTime);
-    const queryDuration = queryEndTime[0] * 1e9 + queryEndTime[1];
-    metrics.databaseQueryDurationHistogram.observe({operation: 'findOne: check if user existed via email', success: exisitngUser ? 'true': 'false'}, queryDuration / 1e9);
-        
-    if(exisitngUser) {
-        return res.status(400).json({
-            message: "User already registered",
-            status: "warning"
+    // check for disposable email address
+    const isEmailDisposable = isDisposable(register.email)
+    if(isEmailDisposable) {
+        return res.status(500).json({
+            message: "This type of email address is not permitted",
+            status: 'warning'
         })
-    }
-
-    try {
-        const hashedPassword = bcrypt.hashSync(register.password, 8);
-        const uid = await generateUserId(register.displayName)
-        const payload = new User({
-            userId: uid,
-            displayName: register.displayName,
-            email: register.email,
-            password: hashedPassword
-        })
-        payload.save()
-        const logResult = {
-            userId: uid,
-            email: register.email,
-            statusCode: res.statusCode,
+    } else {
+        const queryStartTime = process.hrtime();
+        const exisitngUser = await User.findOne({ email: req.body.email });
+            //
+        const queryEndTime = process.hrtime(queryStartTime);
+        const queryDuration = queryEndTime[0] * 1e9 + queryEndTime[1];
+        metrics.databaseQueryDurationHistogram.observe({operation: 'findOne: check if user existed via email', success: exisitngUser ? 'true': 'false'}, queryDuration / 1e9);
+            
+        if(exisitngUser) {
+            return res.status(400).json({
+                message: "User already registered",
+                status: "warning"
+            })
         }
-        logger.info('user registered success', logFormat(req, logResult));
-        //
-        metrics.newUsersCounter.inc();
-        return res.status(200).json({
-            message: "Registered Successfully",
-            xCorrId: req.headers['x-correlation-id'],
-            status: 'success'
-        })
-    } catch (err) {
-        span.addEvent('Catch Error during registration', { 'error': err.message });
-        metrics.errorCounter.inc();
-        span.setAttribute('error', true); // Mark this span as an error
-        logger.error('Error in registration')
-        span.end();
-    }
+
+        try {
+            const hashedPassword = bcrypt.hashSync(register.password, 8);
+            const uid = await generateUserId(register.displayName)
+            const payload = new User({
+                userId: uid,
+                displayName: register.displayName,
+                email: register.email,
+                password: hashedPassword
+            })
+            payload.save()
+            const logResult = {
+                userId: uid,
+                email: register.email,
+                statusCode: res.statusCode,
+            }
+            logger.info('user registered success', logFormat(req, logResult));
+            //
+            metrics.newUsersCounter.inc();
+            return res.status(200).json({
+                message: "Registered Successfully",
+                xCorrId: req.headers['x-correlation-id'],
+                status: 'success'
+            })
+        } catch (err) {
+            span.addEvent('Catch Error during registration', { 'error': err.message });
+            metrics.errorCounter.inc();
+            span.setAttribute('error', true); // Mark this span as an error
+            logger.error('Error in registration')
+            span.end();
+        }
+    } // end else
 }
 
 const login = async (req, res) => {
-    //
     const span = tracer.startSpan('Login', {
         attributes: { 'x-correlation-id': req.correlationId }
     });
@@ -140,7 +104,6 @@ const login = async (req, res) => {
             metrics.errorCounter.inc();
             span.setAttribute('error', true); // Mark this span as an error
             span.end();
-            console.logo('Password is incorrect');
 
             return res.status(401).json({
                 message: "Password is incorrect",
@@ -170,11 +133,11 @@ const login = async (req, res) => {
             }
         } 
     } catch(err) {
-        console.log('Catch Error during login ', err.message)
         span.addEvent('Catch Error during login', {'error': err.message});
         metrics.errorCounter.inc();
         span.setAttribute('error', true); // Mark this span as an error
         span.end();
+        return res.status(500).json({message: `Catch Error during login ${err.message}`, status: 'warning'})
     }
 }
 

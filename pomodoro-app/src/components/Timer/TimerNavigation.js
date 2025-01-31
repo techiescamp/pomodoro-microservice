@@ -1,21 +1,23 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
+import { useAuth } from '../../context/AuthContext'
 import { useTimer } from '../../context/TimerContext'
-import './timer.css'
 import { useTask } from '../../context/TaskContext'
 import clickSound from '../../assets/audio/Mouse_Click.mp3';
 import alarmSound from '../../assets/audio/clock-alarm.mp3';
 import axios from 'axios'
+import './timer.css'
+
 
 const TimerNavigation = () => { 
+    const { user } = useAuth() // check if guest or user
     const { timer, setTimer, setBg } = useTimer()
-    const { setIsTodo, list } = useTask()
+    const { setIsTodo, list, roundsCompleted, setRoundsCompleted, setIsNoUserTodo } = useTask()
     const token = sessionStorage.getItem('token')
 
     const [activeTab, setActiveTab] = useState('timer')
     const [intervalId, setIntervalId] = useState(null)
     const [isTimerStart, setIsTimerStart] = useState(false)
-    const [roundsCompleted, setRoundsCompleted] = useState(0)
     const [message, setMessage] = useState(null)
 
     // for audio
@@ -30,21 +32,12 @@ const TimerNavigation = () => {
     }  
 
     const getCustomTimer = () => {
-        // try{
-            const customTimer = JSON.parse(sessionStorage.getItem('customTimer'))
-            return customTimer || {
-                timer: 25,
-                short_break: 5,
-                long_break: 15
-            }
-        // } catch(err) {
-        //     console.error("Invalid custom timer format: ", err)
-        //     return {
-        //         timer: 25,
-        //         short_break: 5,
-        //         long_break: 15
-        //     }
-        // }
+        const customTimer = JSON.parse(sessionStorage.getItem('customTimer'))
+        return customTimer || {
+            timer: 25,
+            short_break: 5,
+            long_break: 15
+        }
     }
 
     const customTimers = getCustomTimer();
@@ -60,10 +53,6 @@ const TimerNavigation = () => {
         long: '#005B41' 
     }
 
-    useEffect(() => {
-        console.log(timer)
-    },[timer])
-
     const handleTab = (tab) => {
         stopTimer()
         setActiveTab(tab)
@@ -73,6 +62,7 @@ const TimerNavigation = () => {
 
     const startTimer = () => {
         if (!isTimerStart && list?.some(t => !t.checked)) {
+            if(clickAudio) clickAudio.play()
             setIsTimerStart(true)
         }
     }
@@ -106,18 +96,28 @@ const TimerNavigation = () => {
 
     const updateTask = async (id, updates, successMessage, errorMessage) => {
         try {
-            const resp = await axios.put(
-                `http://localhost:7000/api/updateTask/${id}`,
-                updates,
-                { headers: { Authorization: `Bearer ${token}` } }
-            )
-            if(resp.data) {
+            if(user) {
+                const resp = await axios.put(
+                    `http://localhost:7000/api/updateTask/${id}`,
+                    updates,
+                    { headers: { Authorization: `Bearer ${token}` } }
+                )
+                if(resp.data) {
+                    setRoundsCompleted(0)
+                    setIsTimerStart(false)
+                    setIsTodo(prev => prev + 1)
+                    setMessage(successMessage)
+                } else {
+                    setMessage(errorMessage)
+                }
+            } else {
+                const tasks = JSON.parse(sessionStorage.getItem('no_user_todo'))
+                const updatedTaskList = tasks.map(t => t.id === updates.id ? {...updates} : t)
+                sessionStorage.setItem('no_user_todo', JSON.stringify(updatedTaskList))
                 setRoundsCompleted(0)
                 setIsTimerStart(false)
-                setIsTodo(prev => prev + 1)
+                setIsNoUserTodo(prev => prev + 1)
                 setMessage(successMessage)
-            } else {
-                setMessage(errorMessage)
             }
         } catch (err) {
             setMessage(`Exception error in updating task: ${err}`)
@@ -139,8 +139,8 @@ const TimerNavigation = () => {
             setTimer(prev => {
                 if (prev <= 1) {
                     // stop timer
-                    stopTimer()
                     if(alarmAudio) alarmAudio.play()
+                    stopTimer()
 
                     // update rounds
                     const updatedRounds = roundsCompleted + 1

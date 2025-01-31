@@ -13,6 +13,9 @@ import { TimerContextProvider } from './context/TimerContext';
 import { TaskContextProvider } from './context/TaskContext';
 import TList from './components/Reports/TList';
 import TChart from './components/Reports/TChart';
+import GuestSettings from './pages/Settings/GuestSettings';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import Disclaimer from './pages/Disclaimer';
 
 
 function App() {
@@ -38,11 +41,14 @@ function App() {
           <Header />
           <Routes>
             <Route exact path='/' Component={Home} />
-            <Route path="/:username/settings" Component={Settings} />
             <Route path='/login' Component={Login} />
             <Route path='/signup' Component={Signup} />
+            <Route path='/guest/settings' Component={GuestSettings} />
             <Route path='/:username/tasklist' Component={TList} />
             <Route path='/:username/taskchart' Component={TChart} />
+            <Route path="/:username/settings" Component={Settings} />
+            <Route path='/privacy-policy' Component={PrivacyPolicy} />
+            <Route path='/disclaimer' Component={Disclaimer} />
             <Route path='*' Component={ErrorPage} />
           </Routes>
           <Footer />

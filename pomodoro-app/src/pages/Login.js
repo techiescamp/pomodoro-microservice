@@ -23,8 +23,18 @@ const Login = () => {
         })
     }
 
+    const validateEmail = (email) => {
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+        return emailRegex.test(email)
+    }
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+        const isEmailValidate = validateEmail(userLogin.email)
+        if(!isEmailValidate) {
+            alert("Provide valid email address")
+            return;
+        }
         const cid = xCorrId || `pomo-${Math.ceil(Math.random()*1000)}`;
         try {
             const response = await axios.post(`${apiUrl}/auth/login`, { userLogin }, {

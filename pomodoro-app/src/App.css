@@ -9,6 +9,23 @@
   color: black !important;
 }
 
+/* privacy policy page */
+.ordered-list, .page-title {
+  font-family: system-ui, sans-serif;
+  margin-bottom: 10px;
+}
+
+.ordered-list h4 {
+  font-weight: 600;
+  font-family: inherit;
+}
+
+.ordered-list p {
+  font-size: 17px;
+  word-spacing: 1px;
+}
+
+
 @media screen and (max-width: 668px) {
   .form-container {
     width: 85%;
