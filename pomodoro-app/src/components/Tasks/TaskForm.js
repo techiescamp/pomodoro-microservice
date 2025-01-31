@@ -5,7 +5,7 @@ import { useAuth } from '../../context/AuthContext'
 import axios from 'axios'
 
 const TaskForm = () => {
-  const { todo, setTodo, setIsTodo, list, setList, generateId, isEdit, setIsEdit, editData, setEditData } = useTask()
+  const { todo, setTodo, setIsTodo, list, setList, setIsNoUserTodo, generateId, isEdit, setIsEdit, editData, setEditData } = useTask()
   const { timer } = useTimer()
   const { user } = useAuth()
   const token = sessionStorage.getItem('token')
@@ -37,53 +37,88 @@ const TaskForm = () => {
     let addBtn = document.getElementById('addBtn');
     addBtn.style.display = 'block';
     taskform.style.display = 'none';
+
+    // If editing, reset edit mode without modifying the list
+    if (isEdit) {
+      setIsEdit(false);
+      setEditData(null); // Reset editData
+    } else {
+      setTodo({
+        id: generateId(),
+        title: '',
+        description: '',
+        act: 1,
+        timer: Number(timer),
+        checked: false
+      });
+    }
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if(!user) {
-      alert("Register or Login to add task in the application")
-      setTodo({ 
-        ...todo,
+    try {
+      // guest user
+      if(!user) { 
+        setIsNoUserTodo(prev => prev+ 1)
+        const isNoUserTodoExists = JSON.parse(sessionStorage.getItem('no_user_todo'))
+        if(isNoUserTodoExists) { // yes
+          const noUserTodos = [...isNoUserTodoExists, todo]
+          sessionStorage.setItem('no_user_todo', JSON.stringify(noUserTodos))
+        } else {
+          sessionStorage.setItem('no_user_todo', JSON.stringify([todo]))
+        }
+      } 
+      // if user exsits
+      else { 
+        const addTask = {
+          userData: user,
+          userTasks: {
+            date: new Date().toLocaleDateString(),
+            tasks: [todo]
+          }
+        }
+        const resp = await axios.post('http://localhost:7000/api/addTask', { addTask }, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (resp.data) setIsTodo(prev => prev + 1)
+      }
+    } catch(err) {
+      console.error('Exception failure: ', err)
+    }
+    finally {
+      setTodo({
+        id: generateId(),
         title: '',
         description: '',
+        act: 1,
+        timer: Number(timer),
+        checked: false
       })
-    } else {
-      const addTask = {
-        userData: user,
-        userTasks: {
-          date: new Date().toLocaleDateString(),
-          tasks: [todo]
-        }
-      }
-      const resp = await axios.post('http://localhost:7000/api/addTask', { addTask }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (resp.data) {
-        setTodo({
-          id: generateId(),
-          title: '',
-          description: '',
-          act: 1,
-          timer: Number(timer),
-          checked: false
-        })
-        setIsTodo(prev => prev + 1)
-      }
     }
+    
   }
 
   const handleUpdate = async (e) => {
     e.preventDefault()
     try {
-      const updatedTask = { ...editData }
-      await axios.put(`http://localhost:7000/api/editData/${editData.id}`,
-        { updatedTask },
-        { headers: { Authorization: `Bearer ${token}` } }
-      )
-      setList(list.map(task => task.id === editData.id ? { ...task, ...updatedTask } : task))
-      setEditData(null)
-      setIsEdit(false)
+      if(!user) {
+        const taskList = JSON.parse(sessionStorage.getItem('no_user_todo'))
+        const istaskExists = taskList.map(t => t.id === editData.id ? {...t, ...editData} : t)
+        sessionStorage.setItem('no_user_todo', JSON.stringify(istaskExists))
+        setIsNoUserTodo(prev => prev + 1)
+        setEditData(null)
+        setIsEdit(false)
+      }
+      else {
+        const updatedTask = { ...editData }
+        await axios.put(`http://localhost:7000/api/editData/${editData.id}`,
+          { updatedTask },
+          { headers: { Authorization: `Bearer ${token}` } }
+        )
+        setList(list.map(task => task.id === editData.id ? { ...task, ...updatedTask } : task))
+        setEditData(null)
+        setIsEdit(false)
+      }
     } catch (err) {
       console.error('Error in editing task ', err)
     }

@@ -79,6 +79,9 @@ function Header() {
               <li className="nav-item mx-auto me-lg-4 mb-2 mb-lg-0">
                 <Link className="nav-link" to="/signup">Signup</Link>
               </li>
+              <li className="nav-item mx-auto me-lg-4 mb-2 mb-lg-0">
+                <Link className="nav-link" to="/guest/settings">Settings</Link>
+              </li>
             </ul>)
           }
 

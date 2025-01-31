@@ -21,23 +21,33 @@ const Signup = () => {
         })
     }
 
+    const validateEmail = (email) => {
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+        return emailRegex.test(email)
+    }
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+        const isEmailValidate = validateEmail(register.email)
+        if(!isEmailValidate) {
+            alert("Provide valid email address")
+            return;
+        }
         const cid = `pomo-${Math.ceil(Math.random()*200)}`;
         try {
             const response = await axios.post(`${apiUrl}/auth/signup`, { register }, {
                 headers: { 'x-correlation-id': cid }
             })
             setStatus({message: response.data.message, statusCode: response.data.status})
+            navigate('/login')
         } catch(err) {
-            console.error('signup failed ', err)
+            setStatus({message: `signup failed ${err.message}`, statusCode: 'error'})
         } finally {
             setRegister({
                 displayName: '',
                 email: '',
                 password: ''
             });
-            navigate('/login')
         }
     }
 

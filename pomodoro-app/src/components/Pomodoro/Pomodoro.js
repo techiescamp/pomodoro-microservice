@@ -5,9 +5,12 @@ import './pomodoro.css'
 import TaskList from '../Tasks/TaskList'
 import TaskForm from '../Tasks/TaskForm'
 import Report from '../Reports/Report'
+import NoUserTaskList from '../Tasks/NoUserTaskList'
+import { useAuth } from '../../context/AuthContext'
 
 const Pomodoro = () => {
     const { bg } = useTimer()
+    const { user } = useAuth()
 
     const handleAddTask = () => {
         let taskform = document.getElementById('taskform');
@@ -21,15 +24,14 @@ const Pomodoro = () => {
 
   return (
     <>
-        {/* <div id='timer' style={{ backgroundColor: bg }}> */}
         <main className='container-fluid pt-0 pb-5 m-0 timer-container position-relative' style={{ backgroundColor: bg }}>
             <Report />
 
             <div className='container mx-auto timerApp'>
                 <TimerNavigation />
                 <hr className='w-75 mx-auto text-white' />
-
-                <TaskList />
+                
+                { user ? <TaskList /> : <NoUserTaskList /> }
                 <TaskForm />
 
                 {/* Add task Button */}

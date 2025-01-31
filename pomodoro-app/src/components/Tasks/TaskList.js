@@ -6,7 +6,7 @@ import './task.css'
 
 const TaskList = () => {
     const { user } = useAuth()
-    const { list, setList, isTodo, setIsTodo, isEdit, setIsEdit, setEditData } = useTask()
+    const { list, setList, isTodo, setIsTodo, isEdit, setIsEdit, setEditData, roundsCompleted } = useTask()
     const token = sessionStorage.getItem('token')
 
     useEffect(() => {
@@ -81,7 +81,7 @@ const TaskList = () => {
                             <span className='fw-bold'>{item.title}</span>
                         </div>
                         
-                        <div className="badge text-bg-primary rounded-pill me-3">{item.act}</div>
+                        <div className="badge text-bg-primary rounded-pill me-3">{item.act}/{roundsCompleted}</div>
 
                         <div className="dropdown dots">
                             <button

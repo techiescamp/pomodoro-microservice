@@ -53,7 +53,6 @@ const addTask = async (req, res) => {
     else {
       const payload = addTask
       // payload.userTasks.date = new Date(payload.userTasks.date).toLocaleDateString()
-      console.log('new user payload: ', payload)
       
       // db mterics
       const queryStartTime = process.hrtime()
