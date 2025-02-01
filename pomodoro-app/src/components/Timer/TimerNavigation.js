@@ -5,9 +5,11 @@ import { useTimer } from '../../context/TimerContext'
 import { useTask } from '../../context/TaskContext'
 import clickSound from '../../assets/audio/Mouse_Click.mp3';
 import alarmSound from '../../assets/audio/clock-alarm.mp3';
+import config from '../../config'
 import axios from 'axios'
 import './timer.css'
 
+const apiUrl = config.apiUrl
 
 const TimerNavigation = () => { 
     const { user } = useAuth() // check if guest or user
@@ -98,7 +100,7 @@ const TimerNavigation = () => {
         try {
             if(user) {
                 const resp = await axios.put(
-                    `http://localhost:7000/api/updateTask/${id}`,
+                    `${apiUrl}/api/updateTask/${id}`,
                     updates,
                     { headers: { Authorization: `Bearer ${token}` } }
                 )
