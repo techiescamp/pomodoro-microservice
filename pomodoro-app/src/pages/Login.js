@@ -43,6 +43,7 @@ const Login = () => {
             setStatus({message: response.data.message, statusCode: response.data.status})
             if(response.data.token) {
                 login(response.data.user, response.data.token)
+                navigate('/')
             }
         } catch(err) {
             console.error('Login failed')
@@ -52,7 +53,6 @@ const Login = () => {
                 email: '',
                 password: ''
             });
-            navigate('/')
         }
     }
 

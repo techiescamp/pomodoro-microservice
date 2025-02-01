@@ -5,9 +5,12 @@ import { Bar } from 'react-chartjs-2'
 import Report from './Report'
 import { useAuth } from '../../context/AuthContext'
 import { useTask } from '../../context/TaskContext'
+import config from '../../config'
 import axios from 'axios'
 
 Chart.register(CategoryScale)
+
+const apiUrl = config.apiUrl
 
 const TChart = () => {
   const { user } = useAuth()
@@ -27,7 +30,7 @@ const TChart = () => {
   useEffect(() => {
     const fetchChartList = async() => {
       try {
-        const resp = await axios.get('http://localhost:7000/api/getAllTasks', {
+        const resp = await axios.get(`${apiUrl}/api/getAllTasks`, {
             headers: { Authorization: `Bearer ${token}` }
         })
         setList(resp.data.userTasks)
