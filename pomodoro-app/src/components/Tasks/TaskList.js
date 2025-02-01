@@ -2,7 +2,11 @@ import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import { useAuth } from '../../context/AuthContext'
 import { useTask } from '../../context/TaskContext'
+import config from '../../config'
 import './task.css'
+
+
+const apiUrl = config.apiUrl
 
 const TaskList = () => {
     const { user } = useAuth()
@@ -12,7 +16,7 @@ const TaskList = () => {
     useEffect(() => {
         const fetchTasks = async () => {
             try {
-                const resp = await axios.get('http://localhost:7000/api/getTasks', {
+                const resp = await axios.get(`${apiUrl}/api/getTasks`, {
                     headers: { Authorization: `Bearer ${token}` }
                 })
                 setList(resp.data)
@@ -27,7 +31,7 @@ const TaskList = () => {
         // update backend
         try {
             const task = list.find(t => t.id === id)
-            const resp = await axios.put(`http://localhost:7000/api/updateTask/${id}`,
+            const resp = await axios.put(`${apiUrl}/api/updateTask/${id}`,
                 {
                     checked: !task.checked,
                     act: task.act || 1
@@ -51,7 +55,7 @@ const TaskList = () => {
 
     const handleDeleteTask = async (id) => {
         try {
-            await axios.delete(`http://localhost:7000/api/deleteTask/${id}`,
+            await axios.delete(`${apiUrl}/api/deleteTask/${id}`,
                 { headers: { Authorization: `Bearer ${token}` } }
             )
             setList(list.filter(t => t.id !== id))
@@ -63,7 +67,7 @@ const TaskList = () => {
     
     return (
         <ul id="tasklist-container" className='list-group'>
-            {!isEdit && list.map(item => (
+            {!isEdit && list && list.map(item => (
                     <li
                         id={`tasklist-${item.id}`}
                         className="list-group-item d-flex justify-content-between align-items-start"

@@ -19,20 +19,6 @@ import Disclaimer from './pages/Disclaimer';
 
 
 function App() {
-  // const [user, setUser] = useState(() => {
-  //   return JSON.parse(sessionStorage.getItem('userinfo')) || null;
-  // });
-  // const [xCorrId, setXCorrId] = useState(() => {
-  //   return sessionStorage.getItem('xCorrId') || null
-  // });
-
-  // useEffect(() => {
-  //   if (user) {
-  //     setXCorrId(user.xCorrId);
-  //   }
-  // }, [user])
-
-
 
   return (
     <AuthProvider>

@@ -5,8 +5,7 @@ const NoUserTaskList = () => {
     const { isNoUserTodo, roundsCompleted } = useTask()
     const { list, setList, isEdit, setIsEdit, setEditData } = useTask()
 
-    // const [noUserList, setNoUserList] = useState([])
-
+    
     useEffect(() => {
         const taskList = JSON.parse(sessionStorage.getItem('no_user_todo')) || null;
         setList(taskList)
