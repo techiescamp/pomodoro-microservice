@@ -27,7 +27,7 @@ const NoUserTaskList = () => {
     }
 
     const handleDeleteTask = (id) => {
-        const taskList = list.filter(t => t.id === id)
+        const taskList = list.filter(t => t.id !== id)
         sessionStorage.setItem('no_user_todo', JSON.stringify(taskList))
         setList(taskList)
     }
