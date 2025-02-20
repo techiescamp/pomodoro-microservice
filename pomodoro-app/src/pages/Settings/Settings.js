@@ -80,7 +80,7 @@ const Settings = () => {
 
 
     return (
-        <div className='container my-5 py-3'>
+        <div className='settings-container container my-5 py-3'>
             <div className='border border-2 rounded-3 p-3 mb-3'>
                 <h5 className='font-bold mb-4'>Change Profile</h5>
 

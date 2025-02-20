@@ -37,7 +37,7 @@ const GuestSettings = () => {
 
 
     return (
-        <div className='container my-5 py-3'>
+        <div className='settings-container container my-5 py-3'>
             {/* timer */}
             <div className='border border-2 rounded-3 p-3 mb-3'>
                 <h5 className='mb-4'>Customize Timer</h5>

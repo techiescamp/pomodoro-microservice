@@ -22,7 +22,16 @@ const app = express();
 
 // connect to database
 const mongoUrl = config.database.mongoUrl;
-const db = mongoose.connect(mongoUrl);
+
+async function connectdb() {
+  try {
+    await mongoose.connect(mongoUrl)
+    logger.info('MongoDB connected successfully');
+    isDatabaseReady = true;
+  } catch (error) {
+    logger.error('MongoDB connection failed', error);
+  }
+}
 
 // cors middlewares
 app.use(express.json());
@@ -122,29 +131,18 @@ app.use('/', route)
 
 // health checks
 app.get('/health', async (req, res) => {
-  try {
-    // const mongo = await mongoose.connection.db.admin().ping(); // { ok: 1 }
-    const mongo = isDatabaseReady;
-    if(mongo && isServerReady) {
-      res.status(200).json({
-        status: 'HEALTHY',
-        statusCode: 200,
-        Message: "Backend server, metrics server and MonogoDB are UP and running"
-      })
-    } else {
-      res.status(500).json({
-        status: 'UNHEALTHY',
-        statusCode: 500,
-        Message: "Either Server, metrics or MonogDB is DOWN. Please check your codes."
-      })
-    }
-  }
-  catch(err) {
+  const mongo = isDatabaseReady;
+  if (mongo && isServerReady) {
+    res.status(200).json({
+      status: 'HEALTHY',
+      statusCode: 200,
+      Message: "Backend server, metrics server and MonogoDB are UP and running"
+    })
+  } else {
     res.status(500).json({
       status: 'UNHEALTHY',
       statusCode: 500,
-      Message: "Server is DOWN. Please check your codes.",
-      error: err.message
+      Message: "Either Server, metrics or MonogDB is DOWN. Please check your codes."
     })
   }
 })
@@ -156,7 +154,14 @@ app.get('/live', (req, res) => {
       statusCode: 200,
       message: 'Server and MongoDb is UP'
     })
-  } else {
+  } else if(isServerReady && !isDatabaseReady) {
+    res.status(500).json({
+      status: 'DOWN',
+      statusCode: 500,
+      message: "MongoDB is DOWN"
+    })
+  }
+  else {
     res.status(500).json({
       status: 'DOWN',
       statusCode: 500,
@@ -184,16 +189,14 @@ app.get('/ready', async (req, res) => {
 // initialize cron jobs
 taskScheduler()
 
-app.listen(PORT, (err, client) => {
+app.listen(PORT, async (err, client) => {
   if (err) {
     logger.error('Server is not connected', err)
   }
   isServerReady = true;
   logger.info(`server connected at PORT: ${PORT}`)
-  if (db) {
-    isDatabaseReady = true;
-    logger.info('MongoDB database is connected.')
-  }
+  
+  await connectdb()
 })
 
 
