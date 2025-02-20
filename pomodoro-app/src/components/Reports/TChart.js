@@ -46,7 +46,7 @@ const TChart = () => {
 
   useEffect(() => { 
     if(list && list.length > 0) {
-        const formattedDate = list.map(t => t.date && t.date.split('T')[0])
+        const formattedDate = list.map(t => t.date && new Date(t.date).toLocaleString().split(',')[0])
         setLabels(formattedDate) // x-axis
   
         const tasks = list && list.map(t => t.tasks.reduce((total, task) => {
@@ -74,7 +74,7 @@ const TChart = () => {
           })
           return yearData
         }
-  
+        
         const processedData = processMonthlyChart(list)
         setMonthlyTaskData(processedData)
         setIsLoading(false)

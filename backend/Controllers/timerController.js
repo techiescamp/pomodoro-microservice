@@ -24,16 +24,19 @@ const addTask = async (req, res) => {
   
     if (isUserExisted) {
       // format date for display
-      isUserExisted.userTasks.forEach(userTask => {
-        userTask.date = new Date(userTask.date).toLocaleDateString()
-      });
+      const taskDate = new Date(addTask.userTasks.date)
 
-      const formattedDate = new Date(addTask.userTasks.date).toLocaleDateString()
-      const checkDate = isUserExisted.userTasks.findIndex(i => new Date(i.date).toLocaleDateString() === formattedDate)
+      const checkDate = isUserExisted.userTasks.findIndex(t => {
+        const existingDate = new Date(t.date)
+        return existingDate.toISOString().split('T')[0] === taskDate.toISOString().split('T')[0]
+      })
+      
       // new date
       if (checkDate === -1) {
-        addTask.userTasks.date = formattedDate
-        isUserExisted.userTasks.push(addTask.userTasks)
+        isUserExisted.userTasks.push({
+          ...addTask.userTasks,
+          date: new Date(taskDate)
+      })
 
       } else { // already date existed
         isUserExisted.userTasks[checkDate].tasks.push(...addTask.userTasks.tasks)

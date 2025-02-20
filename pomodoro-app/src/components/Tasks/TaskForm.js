@@ -76,7 +76,7 @@ const TaskForm = () => {
         const addTask = {
           userData: user,
           userTasks: {
-            date: new Date().toLocaleDateString(),
+            date: new Date(),
             tasks: [todo]
           }
         }
@@ -98,7 +98,6 @@ const TaskForm = () => {
         checked: false
       })
     }
-    
   }
 
   const handleUpdate = async (e) => {

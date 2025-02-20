@@ -4,21 +4,12 @@ const TimerContext = createContext()
 
 export const TimerContextProvider = ({ children }) => {
   const getCustomTimer = () => {
-    try {
-      const customTimer = JSON.parse(sessionStorage.getItem('customTimer'));
-      return customTimer || {
+    const customTimer = JSON.parse(sessionStorage.getItem('customTimer')) || false;
+    return customTimer || {
         timer: 25,
         short_break: 5,
         long_break: 15
       };
-    } catch (err) {
-      console.error('Invalid custom timer format', err);
-      return {
-        timer: 25,
-        short_break: 5,
-        long_break: 15
-      };
-    }
   };
 
   const customTimers = getCustomTimer()

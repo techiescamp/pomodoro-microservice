@@ -6,19 +6,12 @@ const TaskContext = createContext()
 export const TaskContextProvider = ({ children }) => {
     const { timer } = useTimer()
 
-    const formatTime = (time) => {
-        const minutes = Math.floor(time / 60);
-        const seconds = time % 60
-        const timeFormat = `${String(minutes)}:${String(seconds).padStart(2, '0')}`
-        return timeFormat
-    }  
-
     const [todo, setTodo] = useState({
         id: generateId(),
         title: '',
         description: '',
         act: 1,
-        timer: formatTime(Number(timer)),
+        timer: Number(timer),
         checked: false
     })
     const [list, setList] = useState([])
@@ -40,7 +33,7 @@ export const TaskContextProvider = ({ children }) => {
     useEffect(() => {
         setTodo((prev) => ({
           ...prev,
-          timer: Number(formatTime(timer)),
+          timer: Number(Math.floor(timer/60)),
         }));
     }, [timer]);
 
