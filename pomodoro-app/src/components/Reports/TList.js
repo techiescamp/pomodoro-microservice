@@ -49,7 +49,7 @@ const TList = () => {
                         {list && list.map(t => {
                             return (
                                 <tr key={t.date}>
-                                    <td>{t.date}</td>
+                                    <td>{new Date(t.date).toLocaleString()}</td>
                                     <td>
                                         <ul style={{listStyle: 'none', padding: 0}}>
                                             {t.tasks && t.tasks.map(task => {

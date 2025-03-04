@@ -15,7 +15,6 @@ const userTaskSchema = new mongoose.Schema({
     tasks: [taskSchema], // Array of task subdocuments
     date: {              // Add the date field to userTaskSchema
         type: Date,      // Date type field
-        default: Date.now, // Set default value to the current date/time
     }
 });
 
