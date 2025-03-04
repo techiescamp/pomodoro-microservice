@@ -1,49 +1,54 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom';
-import config from '../../config';
+import config from '../config';
+import axios from 'axios'
 
 const apiUrl = config.apiUrl;
 
 const Signup = () => {
     const navigate = useNavigate();
-    const [status, setStatus] = useState(false);
-    const [userDetails, setUserDetails] = useState({
+    const [status, setStatus] = useState(null);
+    const [register, setRegister] = useState({
         displayName: '',
         email: '',
         password: ''
     });
 
     const handleChange = (e) => {
-        setUserDetails({
-            ...userDetails,
+        setRegister({
+            ...register,
             [e.target.name]: e.target.value
         })
     }
 
-    const handleSubmit = (e) => {
+    const validateEmail = (email) => {
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+        return emailRegex.test(email)
+    }
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
+        const isEmailValidate = validateEmail(register.email)
+        if(!isEmailValidate) {
+            alert("Provide valid email address")
+            return;
+        }
         const cid = `pomo-${Math.ceil(Math.random()*200)}`;
-        fetch(`${apiUrl}/user/signup`, {
-            method: 'POST',
-            body: JSON.stringify(userDetails),
-            headers: {
-                'x-correlation-id': cid,
-                "Content-Type": "application/json"
-            }
-        })
-        .then(res => res.json())
-        .then(data => {
-            setStatus(data);
-            if(data.success === true) {
-                sessionStorage.setItem('xCorrId', data.xCorrId)
-                navigate("/login")
-            }
-        });
-        setUserDetails({
-            displayName: '',
-            email: '',
-            password: ''
-        });
+        try {
+            const response = await axios.post(`${apiUrl}/auth/signup`, { register }, {
+                headers: { 'x-correlation-id': cid }
+            })
+            setStatus({message: response.data.message, statusCode: response.data.status})
+            navigate('/login')
+        } catch(err) {
+            setStatus({message: `signup failed ${err.message}`, statusCode: 'error'})
+        } finally {
+            setRegister({
+                displayName: '',
+                email: '',
+                password: ''
+            });
+        }
     }
 
     const inlineStyle = {
@@ -52,7 +57,7 @@ const Signup = () => {
         padding: '5px'
     }
     function getColor() {
-        if (status.success === true) {
+        if (status?.statusCode === 'success') {
             return 'green'
         } else {
             return 'red'
@@ -64,14 +69,14 @@ const Signup = () => {
             <div className="form-container mx-auto pt-5">
                 <div className='form-wrapper mx-auto border border-outline-secondary p-2 bg-light'>
                     <h3 className='m-3'>SIGN UP FORM</h3>
-                    {status ? <p style={inlineStyle}>{status.message} !</p> : null}
+                    {status && <p style={inlineStyle}>{status.message && status.message} !</p>}
 
                     <form onSubmit={handleSubmit}>
                         <div className='w-75 mx-auto'>
                             <input
                                 type='text'
                                 name='displayName'
-                                value={userDetails.displayName}
+                                value={register.displayName}
                                 onChange={handleChange}
                                 className='form-control mb-3 border border-secondary rounded-1'
                                 placeholder='Your Full name'
@@ -80,7 +85,7 @@ const Signup = () => {
                             <input
                                 type='email'
                                 name='email'
-                                value={userDetails.email}
+                                value={register.email}
                                 onChange={handleChange}
                                 className='form-control mb-3 border border-secondary rounded-1'
                                 placeholder='Enter your email'
@@ -89,7 +94,7 @@ const Signup = () => {
                             <input
                                 type='password'
                                 name='password'
-                                value={userDetails.password}
+                                value={register.password}
                                 onChange={handleChange}
                                 className='form-control mb-3 border border-secondary rounded-1'
                                 placeholder='Enter your password'

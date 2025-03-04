@@ -1,20 +1,21 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import './settings.css'
-import { UserContext } from '../../App';
 import config from '../../config';
+import { useAuth } from '../../context/AuthContext';
+import axios from 'axios'
 
 const apiUrl = config.apiUrl
 
 const Settings = () => {
-    const { user, xCorrId } = useContext(UserContext);
+    const { user, setUser, xCorrId } = useAuth()
+    const token = sessionStorage.getItem('token')
 
     const [profile, setProfile] = useState({
-        displayName: user ? user.displayName : null,
-        email: user ? user.email : null,
+        displayName: (user && user.displayName) || '',
+        email: (user && user.email) || '',
         password: '',
-        avatar: user ? user.avatar : null,
         msg: ''
-    });
+    })
     const [customTime, setCustomTime] = useState({
         timer: 25,
         short_break: 5,
@@ -31,42 +32,42 @@ const Settings = () => {
         e.preventDefault();
 
         if(profile.password !== '') {
-            alert("Are you sure to change to new password ?")
+            const confirm = window.confirm('Are you sure you want to change your password?');
+            if (!confirm) return;
         }
-        fetch(`${apiUrl}/user/updateUser?email=${user.email}`, {
-            method: 'POST',
-            headers: { 
+        const resp = await axios.post(`${apiUrl}/auth/update-user`, 
+            { profile },
+            { headers: { 
+                Authorization: `Bearer ${token}`,
                 'x-correlation-id': xCorrId, 
-                'Content-Type': 'application/json' 
-            },
-            body: JSON.stringify(profile)
-        })
-        .then(res => res.json())
-        .then(data => {
+            }},
+        )
+        if(resp.data) {
+            setUser(resp.data.result)
             setProfile({
-                displayName: data.displayName,
-                email: data.email,
+                displayName: resp.data.result.displayName,
+                email: resp.data.result.email,
                 password: '',
-                avatar: user.avatar,
-                msg: data.message
+                msg: resp.data.message
             })
-            sessionStorage.setItem('userInfo', JSON.stringify({
-                avatar: data.result.avatar,
-                displayName: data.result.displayName,
-                email: data.result.email    
-            }));
-        })
-        closeBtn();
+            closeBtn();
+        }
     }
 
     const handleTimer = (e) => {
-        setCustomTime({...customTime, [e.target.name]: e.target.value})
+        setCustomTime({
+            ...customTime, 
+            [e.target.name]: e.target.value
+        })
     }
 
     const handleTimerForm = (e) => {
         e.preventDefault()
         sessionStorage.setItem('customTimer', JSON.stringify(customTime));
         setMsg("Updated timer successfully")
+        // // Dispatch a custom event to notify TimerContext
+        const event = new Event('custom_time_updated');
+        window.dispatchEvent(event);
         closeBtn()
     }
 
@@ -79,7 +80,7 @@ const Settings = () => {
 
 
     return (
-        <div className='container my-5 py-3'>
+        <div className='settings-container container my-5 py-3'>
             <div className='border border-2 rounded-3 p-3 mb-3'>
                 <h5 className='font-bold mb-4'>Change Profile</h5>
 

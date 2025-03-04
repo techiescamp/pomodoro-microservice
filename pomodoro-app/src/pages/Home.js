@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import Timer from '../Timer/Timer';
-import config from '../../config';
+import Pomodoro from '../components/Pomodoro/Pomodoro'
+import PomodoroContent from '../components/Pomodoro/PomodoroContent';
+import config from '../config';
 //
 // import { trace } from '@opentelemetry/api';
 
@@ -8,8 +9,7 @@ const start = performance.now();
 let loadTime = 0;
 const metrics_url = config.metrics_url;
 
-export default function Home() {
-
+const Home = () => {
     const [errCount, setErrCount] = useState(0);
 
     useEffect(() => {
@@ -36,6 +36,11 @@ export default function Home() {
 
      
     return (
-        <Timer />
+        <div>
+            <Pomodoro />
+            <PomodoroContent />
+        </div>
     )
 }
+
+export default Home
