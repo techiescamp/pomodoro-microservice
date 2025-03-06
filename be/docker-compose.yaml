@@ -1,7 +1,5 @@
-version: '3'
-
 services:
-  nodejs:
+  be-app:
     build:
       context: .
       dockerfile: Dockerfile
