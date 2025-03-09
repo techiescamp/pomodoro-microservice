@@ -1,13 +1,13 @@
 services:
-  pomodoro-be:
+  pomodoro-be-reports-svc:
     build:
       context: .
       dockerfile: Dockerfile
-    image: pomodoro-be:1.0.0
-    container_name: pomodoro-be
+    image: pomodoro-be-reports-svc:1.0.0
+    container_name: pomodoro-be-reports-svc
     restart: unless-stopped
     ports:
-      - "7000:7000"
+      - "7070:7070"
     networks:
       - pomodoro-nw
     env_file:

@@ -1,13 +1,13 @@
 services:
-  pomodoro-be:
+  pomodoro-fe:
     build:
       context: .
       dockerfile: Dockerfile
-    image: pomodoro-be:1.0.0
-    container_name: pomodoro-be
+    image: pomodoro-fe:1.0.0
+    container_name: pomodoro-fe
     restart: unless-stopped
     ports:
-      - "7000:7000"
+      - "3000:3000"
     networks:
       - pomodoro-nw
     env_file:
