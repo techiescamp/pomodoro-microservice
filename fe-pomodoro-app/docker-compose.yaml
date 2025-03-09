@@ -1,0 +1,17 @@
+services:
+  pomodoro-fe:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: pomodoro-fe:1.0.0
+    container_name: pomodoro-fe
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    networks:
+      - pomodoro-nw
+    env_file:
+      - .env
+networks:
+  pomodoro-nw:
+    driver: bridge
