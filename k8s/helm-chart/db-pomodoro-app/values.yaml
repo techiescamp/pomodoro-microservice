@@ -27,7 +27,7 @@ resources:
 ## Network Policy
 
 policy:
-  namespace: backend
+  namespace: be-pomodoro
   appLabels:
     main_backend: backend
     report_backend: report-backend

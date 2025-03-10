@@ -2,7 +2,7 @@ replicaCount: 1
 
 image:
   repository: techiescamp/pomodoro-backend
-  tag: "4.0.0"
+  tag: "3.0.0"
   pullPolicy: IfNotPresent
 
 service:
@@ -26,7 +26,7 @@ resources:
 
 ## Configmap template file data
 port: 7000
-mongourl: mongodb://adminuser:password123@pomodoro-db.db.svc.cluster.local:27017/pomodoro?authSource=admin
+mongourl: mongodb://adminuser:password123@pomodoro-db.db-pomodoro.svc.cluster.local:27017/pomodoro?authSource=admin
 jwt_key: mysecret
 session_secret: supersecret
 frontend_url: http://10.0.0.10:32749
@@ -36,8 +36,8 @@ jaeger_trace_url: http://simplest-collector.observability.svc.cluster.local:1426
 ## Network Policy
 policy:
   frontend:
-    namespace: frontend
+    namespace: fr-pomodoro
     appLabel: frontend
   db:
-    namespace: db
+    namespace: db-pomodoro
     appLabel: db

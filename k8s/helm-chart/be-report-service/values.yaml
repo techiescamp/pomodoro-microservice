@@ -26,5 +26,5 @@ resources:
 
 ## Configmap template file data
 port: 7070
-mongourl: mongodb://adminuser:password123@pomodoro-db.db.svc.cluster.local:27017/pomodoro?authSource=admin
+mongourl: mongodb://adminuser:password123@pomodoro-db.db-pomodoro.svc.cluster.local:27017/pomodoro?authSource=admin
 jaeger_trace_url: http://simplest-collector.observability.svc.cluster.local:14268
