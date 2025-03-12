@@ -1,0 +1,104 @@
+.doc-container {
+    display: flex;
+    position: relative;
+    min-height: 90vh;
+}
+
+/* sidebar */
+#sidebar {
+    width: 30em;
+    min-height: 90vh;
+    background-color: rgb(249, 249, 249);
+    padding: 10px 10px 10px 25px;
+    border-right: 1px solid rgba(0, 0, 0, 0.334);
+    transition: all 0.3s ease;
+}
+
+#sidebar ul {
+    width: 100%;
+    list-style: none;
+}
+
+#sidebar .nav-link {
+    padding: 2px 10px !important;
+    margin-bottom: 0 !important;
+}
+
+#sidebar .nav-link:hover {
+    color: darkblue;
+    font-weight: 600;
+}
+
+/* ------------------- main ----------------------- */
+
+#main-content {
+    font-family: 'Roboto', sans-serif;
+    width: 100%;
+    padding: 3em 6em 4em;
+}
+
+#main-content h1, #main-content h2, #main-content h3, #main-content h4 {
+    font-family: inherit;
+    font-weight: 600;
+    margin: 15px 0;
+}
+
+#main-content h2 {
+    border-bottom: 5px solid rgb(219, 12, 12);
+    border-radius: 8px;
+    width: fit-content;
+}
+
+#main-content h3 {
+    font-size: 1.5em;
+}
+
+#main-content p {
+    font-family: inherit;
+    line-height: 1.5;
+    font-size: 17px;
+    word-spacing: 1.5px;
+    padding-left: 10px;
+    margin-bottom: 10px;
+}
+
+#main-content code {
+    font-size: 16px !important;
+    width: 100%;
+}
+
+#main-content li {
+    margin-bottom: 7px;
+}
+
+#side-icon {
+    display: none;
+}
+
+@media screen and (max-width: 765px) {
+    #sidebar {
+        width: 15em;
+        display: none;
+        position: absolute;
+        height: 100%;
+        padding: 10px;
+    }
+    #sidebar.active {
+        display: 'block';
+    }
+    #sidebar ul:first-child {
+        padding-top: 2em;
+    }
+    #main-content {
+        width: 100%;
+        padding: 3em 4em;
+    }
+    #side-icon {
+        display: block;
+        position: absolute;
+        left: 1.5em;
+        top: 1em;
+        z-index: 10;
+    }
+
+}

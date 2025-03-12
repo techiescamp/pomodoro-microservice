@@ -23,20 +23,16 @@ const PomodoroContent = () => {
             <h3 className='pomo-title text-dark mb-3'>Basic Features</h3>
             <ul className='pomo-content'>
                 <li className='mb-2'>
-                    <b>Estimate Finish Time: </b>
-                    For each completed task you can get an estimate of time required to complete daily tasks.
+                    <b>Estimate Finish Time:</b> For each completed task you can get an estimate of time required to complete daily tasks.
                 </li>
                 <li className='mb-2'>
-                    <b>Completed List: </b>
-                    You can see your finished tasks and time in tabular form and can download your reports
+                    <b>Completed List: </b> You can see your finished tasks and time in tabular form and can download your reports
                 </li>
                 <li className='mb-2'>
-                    <b>Visual Reports: </b>
-                    You can visually see the estimated time you focused on daily basis.
+                    <b>Visual Reports: </b> You can visually see the estimated time you focused on daily basis.
                 </li>
                 <li className='mb-2'>
-                    <b>No Ads: </b>
-                    You can enjoy distraction-free app experience.
+                    <b>No Ads: </b> You can enjoy distraction-free app experience.
                 </li>
             </ul>
         </div>

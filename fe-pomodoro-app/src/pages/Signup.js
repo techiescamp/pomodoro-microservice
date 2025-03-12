@@ -69,7 +69,7 @@ const Signup = () => {
             <div className="form-container mx-auto pt-5">
                 <div className='form-wrapper mx-auto border border-outline-secondary p-2 bg-light'>
                     <h3 className='m-3'>SIGN UP FORM</h3>
-                    {status && <p style={inlineStyle}>{status.message && status.message} !</p>}
+                    {status && <p style={inlineStyle}>{status?.message} !</p>}
 
                     <form onSubmit={handleSubmit}>
                         <div className='w-75 mx-auto'>

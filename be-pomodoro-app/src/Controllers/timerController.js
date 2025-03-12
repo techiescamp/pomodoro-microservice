@@ -101,9 +101,6 @@ const getTasks = async (req, res) => {
     const queryDuration = queryEndTime[0] * 1e9 + queryEndTime[1];
     metrics.databaseQueryDurationHistogram.observe({ operation: 'Fetch unchecked tasks - findOne', success: userTasks ? 'true' : 'false' }, queryDuration / 1e9);
     // 
-    if(!userTasks) {
-
-    }
     const logResult = {
       userId: userId,
       statusCode: res.statusCode

@@ -78,7 +78,6 @@ const login = async (req, res) => {
     metrics.httpRequestCounter.inc();
 
     const { email, password } = req.body.userLogin
-
     try {
         const queryStartTime = process.hrtime();
         const exisitngUser = await User.findOne({ email: email });
@@ -118,6 +117,8 @@ const login = async (req, res) => {
                     id: exisitngUser._id,
                     userId: exisitngUser.userId
                 }
+                console.log('hello login', email , password, comparePassword);
+
                 const user_token = jwt.sign(payload, config.secrets.jwt_key, { expiresIn: 84600 });            
                 //
                 span.addEvent('user logged', { requestBody: JSON.stringify(logResult) })

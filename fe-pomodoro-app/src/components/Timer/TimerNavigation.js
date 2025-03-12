@@ -86,42 +86,31 @@ const TimerNavigation = () => {
   };
 
   const notifyUser = async (taskId) => {
-    const updateTaskElement = list.find((t) => t.id === taskId);
+    const updateTaskElement = list.find(t => t.id === taskId);
     setIsTimerStart(false); // Ensure the start button works properly
 
-    if (window.confirm('Your rounds are over. Do you want to submit the task or continue?')) {
-      const updateAttributes = { ...updateTaskElement, checked: true, timer: formatTime(timer) };
-      await updateTask(taskId, updateAttributes, 'Task submitted', 'Error submitting task');
-    } else {
-      const updateAttributes = { ...updateTaskElement, act: 1, timer: formatTime(timer) };
-      await updateTask(taskId, updateAttributes, 'Task rest', 'Error resetting task');
-    }
+    const updates = window.confirm('Your rounds are over. Do you want to submit the task or continue?') ?
+      { ...updateTaskElement, checked: true, timer: formatTime(timer) }
+      :
+      { ...updateTaskElement, act: 1, timer: formatTime(timer) }
+    const successMsg = updates.checked ? 'Task submitted' : 'Task rest'
+    const errorMsg = updates.checked ? 'Error submitting task' : 'Error resetting task'
+    await updateTask(taskId, updates, successMsg, errorMsg)
   };
 
   const updateTask = async (id, updates, successMessage, errorMessage) => {
     try {
-      if (user) {
-        const resp = await axios.put(
-          `${apiUrl}/api/updateTask/${id}`,
-          updates,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        if (resp.data) {
-          setRoundsCompleted(0);
-          setIsTimerStart(false);
-          setIsTodo((prev) => prev + 1);
-          setMessage(successMessage);
-        } else {
-          setMessage(errorMessage);
-        }
+      const resp = user ? await axios.put(
+        `${apiUrl}/api/updateTask/${id}`,
+        updates,
+        { headers: { Authorization: `Bearer ${token}` } }
+      ) : null
+      if (user && resp?.data) {
+        handleSuccess(successMessage)
+      } else if (!user) {
+        handleGuestTaskUpdate(updates, successMessage)
       } else {
-        const tasks = JSON.parse(sessionStorage.getItem('no_user_todo'));
-        const updatedTaskList = tasks.map((t) => (t.id === updates.id ? { ...updates } : t));
-        sessionStorage.setItem('no_user_todo', JSON.stringify(updatedTaskList));
-        setRoundsCompleted(0);
-        setIsTimerStart(false);
-        setIsNoUserTodo((prev) => prev + 1);
-        setMessage(successMessage);
+        setMessage(errorMessage);
       }
     } catch (err) {
       setMessage(`Exception error in updating task: ${err}`);
@@ -130,45 +119,72 @@ const TimerNavigation = () => {
     }
   };
 
-  useEffect(() => {
-    const firstIncompleteTask = list && list.find((t) => !t.checked);
-    const taskId = firstIncompleteTask ? firstIncompleteTask.id : null;
-    const actLimit = firstIncompleteTask ? firstIncompleteTask.act : 0;
+  const handleSuccess = (successMessage) => {
+    setRoundsCompleted(0);
+    setIsTimerStart(false);
+    setIsTodo((prev) => prev + 1);
+    setMessage(successMessage);
+  }
 
-    if (isTimerStart && !intervalId) {
-      const id = setInterval(() => {
-        setTimer((prev) => {
-          if (prev <= 1) {
-            // Stop timer
-            if (alarmAudio) alarmAudio.play();
-            stopTimer();
+  const handleGuestTaskUpdate = (updates, successMessage) => {
+    const tasks = JSON.parse(sessionStorage.getItem('no_user_todo'));
+    const updatedTaskList = tasks.map(t => (t.id === updates.id ? { ...updates } : t));
+    sessionStorage.setItem('no_user_todo', JSON.stringify(updatedTaskList));
+    setRoundsCompleted(0);
+    setIsTimerStart(false);
+    setIsNoUserTodo((prev) => prev + 1);
+    setMessage(successMessage);
+  }
 
-            // Update rounds
-            const updatedRounds = roundsCompleted + 1;
-            setRoundsCompleted(updatedRounds);
+  const handleTimerTick = (prevTime, taskId, actLimit) => {
+    if (prevTime <= 1) {
+      // Stop timer
+      if(alarmAudio) alarmAudio.play();
+      stopTimer();
 
-            // Notify user if rounds are complete
-            if (updatedRounds >= actLimit) {
-              setTimeout(() => notifyUser(taskId), 1000); // Slight delay for smoother audio play
-            } else {
-              setTimer(defaultTimers[activeTab]); // Reset timer for the next round
-              startTimer()
-            }
-            return defaultTimers[activeTab]; // Prevent timer from going below 0
-          }
-          return prev - 1;
-        });
-      }, 1000);
-      setIntervalId(id);
+      // Update rounds
+      const updatedRounds = roundsCompleted + 1;
+      setRoundsCompleted(updatedRounds);
+
+      // Notify user if rounds are complete
+      if (updatedRounds >= actLimit) {
+        setTimeout(() => notifyUser(taskId), 1000); // Slight delay for smoother audio play
+      } else {
+        setTimer(defaultTimers[activeTab]); // Reset timer for the next round
+        startTimer()
+      }
+      return defaultTimers[activeTab]; // Prevent timer from going below 0
     }
+    return prevTime - 1;
+  }
+
+  useEffect(() => {
+    if (!isTimerStart || intervalId) return
+
+    const firstIncompleteTask = list?.find(t => !t.checked);
+    const taskId = firstIncompleteTask?.id
+    const actLimit = firstIncompleteTask.act || 0
+
+    const id = setInterval(() => {
+      setTimer(prev => handleTimerTick(prev, taskId, actLimit))
+    }, 1000)
+    setIntervalId(id)
 
     return () => {
       if (intervalId) {
-        clearInterval(intervalId);
-        setIntervalId(null);
+        clearInterval(intervalId)
+        setIntervalId(null)
       }
-    };
-  }, [isTimerStart, activeTab, roundsCompleted]);
+    }
+  }, [isTimerStart, intervalId, list, setTimer]);
+
+
+
+  const getTabLabel = (tab) => {
+    if (tab === 'timer') return 'Timer';
+    if (tab === 'short') return 'Short Break';
+    return 'Long Break';
+  };
 
   return (
     <div className="my-2 w-100 text-center">
@@ -187,7 +203,7 @@ const TimerNavigation = () => {
       <nav id="timer-nav">
         <ul className="nav-pills timer-pill d-flex justify-content-center align-items-center" id="pills-tab" role="tablist">
           {['timer', 'short', 'long'].map((tab) => (
-            <li key={`${tab}`} className="nav-item rounded-pill py-1 px-md-4 px-0 me-3" role="presentation">
+            <li key={`${tab}`} className="nav-item rounded-pill py-1 px-md-4 px-0 me-3">
               <Link
                 type="button"
                 className={`nav-link ${activeTab === tab ? 'active' : ''}`}
@@ -197,7 +213,7 @@ const TimerNavigation = () => {
                 aria-selected={activeTab === tab}
                 onClick={() => handleTab(tab)}
               >
-                {tab === 'timer' ? 'Timer' : tab === 'short' ? 'Short Break' : 'Long Break'}
+                {getTabLabel(tab)}
               </Link>
             </li>
           ))}
@@ -212,7 +228,6 @@ const TimerNavigation = () => {
             id={`pills-${tab}`}
             role="tabpanel"
             aria-labelledby={`pills-${tab}-tab`}
-            tabIndex="0"
           >
             {timer && formatTime(timer)}
           </div>
@@ -231,7 +246,7 @@ const TimerNavigation = () => {
         </button>
       </div>
     </div>
-  );
-};
+  )
+}
 
 export default TimerNavigation;

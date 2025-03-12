@@ -1,9 +1,8 @@
-import React, { useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import React from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import './Header.css';
 import { useAuth } from '../../context/AuthContext';
 import { useTask } from '../../context/TaskContext';
-import { useNavigate } from 'react-router-dom'
 
 
 function Header() {
@@ -44,13 +43,9 @@ function Header() {
                   {/* avtar toggle button */}
                   <button className='px-3 py-1 mx-auto rounded-pill border border-info-subtle d-flex align-items-md-center dropdown-toggle' type="button" data-bs-toggle="dropdown" aria-expanded="false">
                     <span className="avatar me-2">
-                    {(user?.displayName && user.displayName[0]) || 
-                      (user?.name && user.name[0]) || 
-                    ''}
+                    {user?.displayName?.[0] || user?.name?.[0] || ''}
                     </span>
-                    {(user?.displayName && user.displayName) || 
-                      (user?.name && user.name) || 
-                    ''}
+                    {(user?.displayName && user.displayName) || (user?.name && user.name) || ''}
                   </button>
 
                   <ul className='dropdown-menu'>
@@ -60,13 +55,18 @@ function Header() {
                         <p className='mb-0'>#{user.email}</p>
                       </Link>
                     </li>
+                    <li className="nav-item mx-auto me-lg-4 mb-2 mb-lg-0">
+                      <Link className='nav-link' to='/doc'>Document</Link>
+                    </li>
                     <li className='dropdown-item mb-1 py-2'>
                       <Link to={`/${user.displayName}/settings`} className="text-decoration-none text-black">
                         <i className="bi bi-person-circle me-3"></i>Settings
                       </Link>
                     </li>
-                    <li className='dropdown-item mb-1 py-2' onClick={logout}>
-                      <i className="bi bi-box-arrow-right me-3"></i>Logout
+                    <li className='dropdown-item mb-1 py-2'>
+                      <button className='btn btn-link text-black p-0' onClick={logout}>
+                        <i className="bi bi-box-arrow-right me-3"></i>Logout
+                      </button>
                     </li>
                   </ul>
                 </li> 
@@ -78,6 +78,9 @@ function Header() {
               </li>
               <li className="nav-item mx-auto me-lg-4 mb-2 mb-lg-0">
                 <Link className="nav-link" to="/signup">Signup</Link>
+              </li>
+              <li className="nav-item mx-auto me-lg-4 mb-2 mb-lg-0">
+                <Link className='nav-link' to='/doc'>Document</Link>
               </li>
               <li className="nav-item mx-auto me-lg-4 mb-2 mb-lg-0">
                 <Link className="nav-link" to="/guest/settings">Settings</Link>
