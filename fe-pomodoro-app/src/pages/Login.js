@@ -69,7 +69,7 @@ const Login = () => {
                     <h3 className='m-3'>LOGIN FORM</h3>
                     {status ? 
                         <p style={inlineStyle} className={status.statusCode === 'success' ? 'text-success' : 'text-danger'}>
-                            {status.message && status.message}</p> 
+                            {status?.message}</p> 
                     : null
                     }
 
@@ -80,7 +80,7 @@ const Login = () => {
                                 name='email'
                                 value={userLogin.email}
                                 onChange={handleChange}
-                                autoComplete='current-email'
+                                autoComplete='email'
                                 className='form-control mb-3 border border-secondary rounded-1'
                                 placeholder='Enter your email'
                                 required

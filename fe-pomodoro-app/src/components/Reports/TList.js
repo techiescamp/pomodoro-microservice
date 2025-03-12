@@ -24,7 +24,7 @@ const TList = () => {
             }
         }
         if (user) { fetchTasks() }
-    }, [user])
+    }, [user, token, setList])
 
 
   return (
@@ -46,24 +46,24 @@ const TList = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {list && list.map(t => {
+                        {list?.map(t => {
                             return (
                                 <tr key={t.date}>
                                     <td>{new Date(t.date).toLocaleString()}</td>
                                     <td>
                                         <ul style={{listStyle: 'none', padding: 0}}>
-                                            {t.tasks && t.tasks.map(task => {
+                                            {t.tasks?.map(task => {
                                                 return (
-                                                    <li key={task.id}>{task.title ? task.title : '-'}</li>
+                                                    <li key={task.id}>{task.title || '-'}</li>
                                                 )
                                             })}
                                         </ul>
                                     </td>
                                     <td>
                                         <ul style={{listStyle: 'none', padding: 0}}>
-                                            {t.tasks && t.tasks.map(task => {
+                                            {t.tasks?.map(task => {
                                                 return (
-                                                    <li key={task.id}>{task.act ? task.act*Number(task.timer) : 0}<span> min</span></li>
+                                                    <li key={task.id}>{task.act ? task.act * Number(task.timer) : 0}<span> min</span></li>
                                                 )
                                             })}
                                         </ul>
@@ -71,16 +71,16 @@ const TList = () => {
                                     
                                     <td>
                                         <ul style={{listStyle: 'none'}}>
-                                            {t.tasks && t.tasks.map(task => {
+                                            {t.tasks?.map(task => {
                                                 return (
-                                                    <li key={task.id}>{task.description ? task.decription : 'none'}</li>
+                                                    <li key={task.id}>{task.description || 'none'}</li>
                                                 )
                                             })}
                                         </ul>
                                     </td>
                                 </tr>
                             )
-
+                        
                         })}
                     </tbody>
                 </table>

@@ -29,11 +29,6 @@
     display: none;
 }
 
-/* .dropdown.dots {
-    position: absolute;
-    right: 12px;
-} */
-
 .dropdown.dots button {
     border-color: #ccc;
     background-color: #f4f4f4;

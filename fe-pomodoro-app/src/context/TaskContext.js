@@ -1,4 +1,5 @@
-import React, { useState, useEffect, createContext, useContext } from 'react'
+import React, { useState, useEffect, createContext, useContext, useMemo } from 'react'
+import PropTypes from 'prop-types'
 import { useTimer } from './TimerContext'
 
 const TaskContext = createContext()
@@ -43,22 +44,26 @@ export const TaskContextProvider = ({ children }) => {
     }
 
         
+    const contextValue = useMemo(() => ({
+        todo, setTodo, 
+        list, setList, 
+        isTodo, setIsTodo, 
+        isNoUserTodo, setIsNoUserTodo,
+        isEdit, setIsEdit, 
+        editData, setEditData,
+        roundsCompleted, setRoundsCompleted,
+        generateId, 
+        clearTasks, 
+    }), [todo, list, isTodo, isNoUserTodo, isEdit, editData, roundsCompleted]);
+
     return (
-        <TaskContext.Provider value={{
-            todo, setTodo, 
-            list, setList, 
-            isTodo, setIsTodo, 
-            isNoUserTodo, setIsNoUserTodo,
-            isEdit, setIsEdit, 
-            editData, setEditData,
-            roundsCompleted, setRoundsCompleted,
-            generateId, 
-            clearTasks, 
-            }}
-        >
+        <TaskContext.Provider value={contextValue}>
             {children}
         </TaskContext.Provider>
     )
+}
+TaskContextProvider.propTypes = {
+    children: PropTypes.node.isRequired,
 }
 
 export const useTask = () => useContext(TaskContext)

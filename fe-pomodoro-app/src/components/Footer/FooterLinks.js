@@ -11,7 +11,7 @@ const FooterLinks = () => {
                 <li><Link to='/signup'>Signup</Link></li>
             </ul>
             <ul className='list-unstyled col'>
-                <li><Link to='/'>About Pomodoro</Link></li>
+                <li><Link to='/doc'>Document</Link></li>
                 <li><Link to='/privacy-policy'>Privacy Policy</Link></li>
                 <li><Link to='/disclaimer'>Disclaimer</Link></li>
             </ul>
