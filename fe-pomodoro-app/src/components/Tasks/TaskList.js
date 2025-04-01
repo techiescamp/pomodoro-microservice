@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import axios from 'axios'
 import { useAuth } from '../../context/AuthContext'
 import { useTask } from '../../context/TaskContext'
@@ -25,7 +25,7 @@ const TaskList = () => {
             }
         }
         if (user) { fetchTasks() }
-    }, [user, isTodo])
+    }, [user, token, setList, isTodo])
 
     const handleChecked = async (id) => {
         // update backend
@@ -67,11 +67,11 @@ const TaskList = () => {
     
     return (
         <ul id="tasklist-container" className='list-group'>
-            {!isEdit && list && list.map(item => (
+            {!isEdit && list?.map(item => (
                     <li
                         id={`tasklist-${item.id}`}
                         className="list-group-item d-flex justify-content-between align-items-start"
-                        key={item.id}
+                        key={`tasklist-${item.id}`}
                     >
                         <div className='ms-2 me-auto'>
                             <input
@@ -94,14 +94,14 @@ const TaskList = () => {
                             >
                                 ...
                             </button>
-                            <ul className="dropdown-menu">
-                                <li className="dropdown-item" onClick={() => handleEditTask(item.id)}>
+                            <div className="dropdown-menu">
+                                <button className="dropdown-item" onClick={() => handleEditTask(item.id)}>
                                     Edit
-                                </li>
-                                <li className="dropdown-item" onClick={() => handleDeleteTask(item.id)}>
+                                </button>
+                                <button className="dropdown-item" onClick={() => handleDeleteTask(item.id)}>
                                     Delete
-                                </li>
-                            </ul>
+                                </button>
+                            </div>
                         </div>
                     </li>
                 ))

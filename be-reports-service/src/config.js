@@ -14,4 +14,4 @@ const config = {
 
 module.exports = config;
 
-        // db_name: process.env.DB_NAME
+// db_name: process.env.DB_NAME

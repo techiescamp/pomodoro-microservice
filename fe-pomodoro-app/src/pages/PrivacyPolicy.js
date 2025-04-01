@@ -35,16 +35,13 @@ const PrivacyPolicy = () => {
                 <p>We use your information to:</p>
                 <ul>
                     <li className='ordered-list'>
-                        <b>To improve customer service: </b>
-                        Information you provide helps us respond to your customer service requests and support needs more efficiently.
+                        <b>To improve customer service: </b> Information you provide helps us respond to your customer service requests and support needs more efficiently.
                     </li>
                     <li className='ordered-list'>
-                        <b>To personalize user experience: </b>
-                        We may use information in the aggregate to understand how our users as a group use the services and resources provided in our application.
+                        <b>To personalize user experience: </b> We may use information in the aggregate to understand how our users as a group use the services and resources provided in our application.
                     </li>
                     <li className='ordered-list'>
-                        <b>To send periodic emails: </b>
-                        We may use your email addresses to send users information and updates pertaining to their order. User email addresses may also be used to respond to customer inquiries, questions, or other requests.
+                        <b>To send periodic emails: </b> We may use your email addresses to send users information and updates pertaining to their order. User email addresses may also be used to respond to customer inquiries, questions, or other requests.
                     </li>
                 </ul>
             </li>
@@ -53,8 +50,8 @@ const PrivacyPolicy = () => {
                 <h4>Data Sharing & Third-Party Services</h4>
                 <p>
                     We do not sell your personal data. However, we may share your information with: 
-                    <i>Service Providers:</i> Third-party tools for analytics, hosting, and communication.
-                    <i>Legal Compliance:</i> If required by law or to protect our rights and users.
+                    <p><i>Service Providers:</i> Third-party tools for analytics, hosting, and communication </p> 
+                    <p><i>Legal Compliance:</i> If required by law or to protect our rights and users. </p>
                 </p>
             </li>
 

@@ -10,6 +10,8 @@ import Signup from './pages/Signup';
 import GuestSettings from './pages/Settings/GuestSettings';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import Disclaimer from './pages/Disclaimer';
+import Document from './pages/Tech Document/Document';
+import DocContent from './pages/Tech Document/DocContent';
 
 import { AuthProvider } from './context/AuthContext';
 import { TimerContextProvider } from './context/TimerContext';
@@ -18,7 +20,6 @@ import { TaskContextProvider } from './context/TaskContext';
 import TList from './components/Reports/TList';
 import TChart from './components/Reports/TChart';
 import ErrorPage from './pages/ErrorPage';
-
 
 
 function App() {
@@ -38,6 +39,10 @@ function App() {
               <Route path="/:username/settings" Component={Settings} />
               <Route path='/privacy-policy' Component={PrivacyPolicy} />
               <Route path='/disclaimer' Component={Disclaimer} />
+              <Route path='/doc' Component={Document}>
+                <Route path=":slug" Component={DocContent} />
+                <Route index Component={DocContent} />
+              </Route>
             </Route>
           
             <Route path='*' Component={ErrorPage} />

@@ -4,6 +4,7 @@ const { addTask, getTasks, getAllTasks, updateTask, editData, deleteTask } = req
 const { signup, login, isUserVerified, updateUser, logout } = require('../Controllers/userController');
 const { sendMails, subscribe } = require('../Controllers/mailController');
 const verifyUser = require('../middlewares/authentication');
+const { getSidebarTitles, getDoc } = require('../Controllers/docController');
 
 const route = express.Router();
 
@@ -26,5 +27,9 @@ route.get('/auth/logout', verifyUser, logout);
 // mail routes for subscriptions
 route.post('/subscribe', subscribe);
 route.post('/send-mail', sendMails);
+
+// document route
+route.get('/doc/docTitles', getSidebarTitles)
+route.get('/doc/:slug', getDoc)
 
 module.exports = route;

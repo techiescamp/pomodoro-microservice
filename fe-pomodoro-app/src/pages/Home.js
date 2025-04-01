@@ -2,8 +2,6 @@ import React, { useState, useEffect } from 'react';
 import Pomodoro from '../components/Pomodoro/Pomodoro'
 import PomodoroContent from '../components/Pomodoro/PomodoroContent';
 import config from '../config';
-//
-// import { trace } from '@opentelemetry/api';
 
 const start = performance.now();
 let loadTime = 0;

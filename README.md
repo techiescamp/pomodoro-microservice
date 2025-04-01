@@ -1,42 +1,58 @@
 # Pomodoro Web Application
-### Time Management Tool - Pomodoro Application
+### Time Management Tool based on Pomodoro Application
 --------------------------------------------------------------
 
 ----------------------------------------------------------------------------------------------------------------------------
 ### Overview
 ----------------------------------------------------------------------------------------------------------------------------
-The Pomodoro Web Application is a time management tool built using the MERN stack that helps users stay productive by following the Pomodoro technique. It allows users to create, track, and manage tasks effectively. The application includes observability features to monitor performance and detect potential issues.
-
+The Pomodoro Web Application is a productivity tool designed to help users manage their time effectively using the Pomodoro Technique. Built with the MERN stack (MongoDB, Express.js, React.js, Node.js), it enables users to create, track, and manage tasks seamlessly. The app includes observability features to monitor performance and troubleshoot issues efficiently.
 
 ----------------------------------------------------------------------------------------------------------------------------
-### Techncial Aspects & Features
+### Techncial Aspects & Versions
 ----------------------------------------------------------------------------------------------------------------------------
+
 #### 1. Technology Stack
     - Frontend: React.js
     - Backend: Node.js, Express.js
     - Database: MongoDB
     - State Management: React Context API
-    - Authentication: JWT - based authentication
+    - Authentication: JSON Web Token (JWT) - based authentication
 
 #### 2. Observability and Monitoring Tools
-The application incorporates observability tools to ensure performance monitoring and debugging:
+The application incorporates observability tools for performance monitoring and debugging:
 
     - Logs: Winston Logger
     - Metrics: Prometheus
     - Traces: Jaeger (via OpenTelemetry)
 
 #### 3. Debugging and Performance Monitoring
-    - Browser DevTools (Inspect Element)
+    - Browser Developer Tools (e.g., Inspect Browser Element)
     - OpenTelemetry for distributed tracing
 
+#### Version Used
+    - `node` - v22.14.0
+    - `express.js` - 4.21.2
+    - `react` - 18.3.1
+    - `@opentelemetry/exporter-jaeger`: 1.24.1
+    - `winston`: 3.13.0
+    - `prom-client`: 14.2.0
+    - `react-dom` - 18.3.1
+    - `react-router-dom` - 6.23.0
+    - `react-scripts` - 5.0.1
+    - `booststrap.css` - 2.10.2
+    - `react-markdown` - 10.1.0
+    - `chart.js` - 4.4.2
+    - `mongodb`: 6.14.2
+    - `mongoose`: 8.12.0
+    - `jsonwebtoken`: 9.0.2
 
 ----------------------------------------------------------------------------------------------------------------------------
 ### Application Usage
 ----------------------------------------------------------------------------------------------------------------------------
-The Pomodoro App can be used with or without user login:
+The Pomodoro App supports both guest and registered users:
 
-    - Guest Users: Access Task List and Task Chart
-    - Registered Users: Can add, edit, delete, and track tasks along with detailed analytics
+    - Guest Users: Use Pomdoro Timer and Todo Task but cannot access Task List and Task Chart
+    - Registered Users: Access `Task List` and `Task Chart` for detailed user analytics.
 
 
 ----------------------------------------------------------------------------------------------------------------------------
@@ -46,27 +62,27 @@ The Pomodoro App can be used with or without user login:
 #### 1. Application metrics
 ----------------------------
 
-![alt application_metrics_image](images\application_metrics.png)
+![alt application_metrics_image](images/application_metrics.png)
 
 
 #### 2. Client-side metrics
 ----------------------------
-![alt client_metrics_image](images\client_metrics.png)
+![alt client_metrics_image](images/client_metrics.png)
 
 
 #### 3. Session Management metrics
 ------------------------------------------
-![alt session_metrics_image](images\session_metrics.png)
+![session_metrics_image](images/session_metrics.png)
 
 
 #### User Management Metrics
 ------------------------------
-![alt user_metrics_image](images\user_metrics.png)
+![user_metrics_image](images/user_metrics.png)
 
 
 #### Tasks Metrics
 --------------------------
-![alt task_metrics_image](images\task_metrics.png)
+![task_metrics_image](images/task_metrics.png)
 
 
 ----------------------------------------------------------------------------------------------------------------------------
@@ -81,51 +97,38 @@ cd pomodoro-microservice
 ----------------------------------------------------------------------------------------------------------------------------
 ### Install dependencies
 ----------------------------------------------------------------------------------------------------------------------------
-#### Backend
+#### For Backend Pomodoro App
 
 ```bash
 cd backend
 npm install
+
+// to run code
+npm run dev (for development environment)
+npm start (for production environment)
 ```
 
-#### Second server or backend
+#### For backend Reports Service 
 
 ```bash
 cd reports-service
 npm install
+
+// to run code
+npm run dev (for development environment)
+npm start (for production environment)
 ```
 
-#### Frontend
+#### Frontend Pomdooro App
 
 ```bash
 cd pomodoro-app
 npm install
-```
 
---------------------------------------------------------------------------------------------------------------------------------
-### Start The Application
----------------------------------------------------------------------------------------------------------------------------------
-
-#### Backend (Runs on Port 7000)
-
-```bash
-cd backend
+// to run code
 npm start
 ```
 
-#### Second backend(Runs on port 7070)
-
-```bash
-cd reports-service
-npm start
-```
-
-#### Frontend (Runs on port 3000)
-
-``` bash
-cd pomodoro-app
-npm start
-```
 
 ---------------------------------------------------------------------------------------------------------------------------------
 ### Docker setup for "BACKEND"

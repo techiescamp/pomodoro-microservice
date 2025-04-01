@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useEffect, useState } from 'react'
+import React, { createContext, useContext, useEffect, useState, useMemo } from 'react'
+import PropTypes from 'prop-types'
 import config from '../config'
 
 const AuthContext = createContext()
@@ -33,8 +34,13 @@ export const AuthProvider = ({ children }) => {
     }
 
 
+    const contextValue = useMemo(() => ({ user, setUser, xCorrId, setXCorrId, login }), [user, xCorrId])
+    AuthProvider.propTypes = {
+        children: PropTypes.node.isRequired,
+    }
+
     return (
-        <AuthContext.Provider value={{ user, setUser, xCorrId, setXCorrId, login }}>
+        <AuthContext.Provider value={contextValue}>
             {children}
         </AuthContext.Provider>
     )

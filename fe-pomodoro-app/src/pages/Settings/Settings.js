@@ -87,7 +87,7 @@ const Settings = () => {
                 {profile.msg ? 
                 <p className='close bg-success-subtle p-2 text-success rounded-3 d-flex justify-content-between'>
                     {profile.msg} 
-                    <span className='me-5' onClick={closeBtn}>x</span>
+                    <button className='me-5' onClick={closeBtn}>x</button>
                 </p>
                 : null}
 
