@@ -1,0 +1,39 @@
+#task-container {
+    width: 32em;
+    height: 100%;
+    background-color: #e2e2e2;
+    border: 1px solid rgba(116, 116, 117, 0.3);
+    margin: 20px auto;
+} 
+
+.tasklist {
+    width: 100%;
+    padding: 10px 15px;
+    margin-bottom: 20px;
+    border: 1px solid;
+    border-radius: 4px;
+    background-color: #fff;
+    position: relative;
+}
+
+.act {
+    background-color: darkmagenta;
+    color: #fff;
+    font-size: 12px;
+    border-radius: 50%;
+    padding: 1px 4px;
+    margin-left: 10px;
+}
+
+#form {
+    display: none;
+}
+
+.dropdown.dots button {
+    border-color: #ccc;
+    background-color: #f4f4f4;
+}
+
+.dropdown-toggle::after {
+    border: none !important;
+}

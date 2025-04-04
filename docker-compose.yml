@@ -1,0 +1,47 @@
+services:
+  pomodoro-be:
+    build:
+      context: ./be-pomodoro-app
+      dockerfile: Dockerfile
+    image: pomodoro-be:1.0.0
+    container_name: pomodoro-be
+    restart: unless-stopped
+    ports:
+      - "7000:7000"
+    networks:
+      - pomodoro-nw
+    env_file:
+      - .env
+
+  pomodoro-be-reports-svc:
+    build:
+      context: ./be-reports-service
+      dockerfile: Dockerfile
+    image: pomodoro-be-reports-svc:1.0.0
+    container_name: pomodoro-be-reports-svc
+    restart: unless-stopped
+    ports:
+      - "7070:7070"
+    networks:
+      - pomodoro-nw
+    env_file:
+      - .env
+
+  pomodoro-fe:
+    build:
+      context: ./fe-pomodoro-app
+      dockerfile: Dockerfile
+    image: pomodoro-fe:1.0.0
+    container_name: pomodoro-fe
+    restart: unless-stopped
+    ports:
+      - "80:3000"
+    networks:
+      - pomodoro-nw
+    env_file:
+      - .env
+
+networks:
+  pomodoro-nw:
+    driver: bridge
+
