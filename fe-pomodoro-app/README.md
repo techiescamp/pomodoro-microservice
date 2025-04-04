@@ -17,10 +17,10 @@ docker build -t pomodoro-frontend:1.0.0 .
 Create a .env file with the following content:
 
 ```bash
-REACT_APP_API_URL=http://localhost:7000
-REACT_APP_REPORTS_API_URL=http://localhost:7070
-REACT_APP_METRICS_URL=http://localhost:7000/metrics
-REACT_APP_JAEGER_TRACE_URL=http://52.43.65.153:30894
+REACT_APP_API_URL=<base-url:http://localhost:3000>
+REACT_APP_REPORTS_API_URL=<reports-server-url>
+REACT_APP_METRICS_URL=<metrics-url:http://localhost:port/metrics>
+REACT_APP_JAEGER_TRACE_URL=<jaeger-trace-url>
 ```
 
 ### Details
@@ -36,13 +36,13 @@ REACT_APP_JAEGER_TRACE_URL=http://52.43.65.153:30894
 Run the Docker container using this command:
 
 ```bash
-docker run -d -p 3000:3000 --env-file .env pomodoro-frontend:1.0.0
+docker run -d -p <port>:<port> --env-file .env pomodoro-frontend:1.0.0
 ```
 
 If your *.env* file is located in another directory, specify the path like this:
 
 ```bash
-docker run -d -p 3000:3000 --env-file /path/to/.env pomodoro-frontend:1.0.0
+docker run -d -p <port>:<port> --env-file /path/to/.env pomodoro-frontend:1.0.0
 ```
 
 ## Debugging Tips

@@ -2,9 +2,33 @@ const client = require('prom-client');
 // Create a new registry for the metrics
 let register = new client.Registry();
 
+// frontend metrics
+// ----------------------------------------------------------------------
+const pageLoadTimeGauge = new client.Gauge({
+    name: 'pomodoro_client_page_load_time_seconds',
+    help: 'Page load time in seconds',
+    registers: [register]
+});
+
+const clientErrorCounter = new client.Counter({
+    name: 'pomodoro_client_errors_total',
+    help: 'Number of client-side errors',
+    registers: [register]
+});
+
+const startButtonClick = new client.Counter({
+    name: 'start_button_click',
+    help: "Number of times 'start' button is clicked",
+    registers: [register]
+})
+
+const interruptedTaskCount = new client.Counter({
+    name: 'interrupted_task_count',
+    help: "Number of times 'stop' or 'pause' button is clicked",
+    registers: [register]
+})
 
 // break mertrics
-// -----------------------
 const shortBreakCounter = new client.Counter({
     name: 'pomodoro_short_break_total',
     help: 'Number of short breaks taken',
@@ -17,8 +41,14 @@ const longBreakCounter = new client.Counter({
     registers: [register]
 });
 
+// document metric
+const documentPageClick = new client.Counter({
+    name: 'pomodoro_document_page_click',
+    help: 'Number of Document Page Click',
+    registers: [register]
+})
+
 // user metrics
-// --------------
 const activeUsersGauge = new client.Gauge({
     name: 'pomodoro_active_users',
     help: 'Number of active users',
@@ -32,7 +62,6 @@ const newUsersCounter = new client.Counter({
 });
 
 // tasks metrics
-// ----------------
 const tasksCreatedCounter = new client.Counter({
     name: 'pomodoro_tasks_created_total',
     help: 'Number of tasks created',
@@ -51,8 +80,9 @@ const downloadReportsCounter = new client.Counter({
     registers: [register]
 })
 
+// Backend metrics
+// -----------------------------------------------------------
 // application performance metrics
-// ---------------------------------
 const httpRequestCounter = new client.Counter({
     name: 'pomodoro_http_requests_total',
     help: 'Number of HTTP requests',
@@ -100,20 +130,6 @@ const cpuUsageGauge = new client.Gauge({
     registers: [register]
 });
 
-// client side metrics
-// ----------------------
-const pageLoadTimeGauge = new client.Gauge({
-    name: 'pomodoro_client_page_load_time_seconds',
-    help: 'Page load time in seconds',
-    registers: [register]
-});
-
-const clientErrorCounter = new client.Counter({
-    name: 'pomodoro_client_errors_total',
-    help: 'Number of client-side errors',
-    registers: [register]
-});
-
 
 module.exports = {
     register,
@@ -131,6 +147,9 @@ module.exports = {
     appUptimeGauge,
     memoryUsageGauge,
     cpuUsageGauge,
+    documentPageClick,
     pageLoadTimeGauge,
     clientErrorCounter,
+    startButtonClick,
+    interruptedTaskCount
 }

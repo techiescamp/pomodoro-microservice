@@ -17,9 +17,9 @@ docker build -t pomodoro-report-backend:1.0.0 .
 Create a .env file with the following content:
 
 ```bash
-PORT=7070
+PORT=<port-number>
 MONGODB_URL=<mongodburl>
-JAEGER_TRACE_URI=http://52.43.65.153:30894
+JAEGER_TRACE_URI=<jager-trace-url>
 ```
 
 ### Details
@@ -34,13 +34,13 @@ JAEGER_TRACE_URI=http://52.43.65.153:30894
 Run the Docker container using this command:
 
 ```bash
-docker run -d -p 7070:7070 --env-file .env pomodoro-report-backend:1.0.0
+docker run -d -p <port>:<port> --env-file .env pomodoro-report-backend:1.0.0
 ```
 
 If your *.env* file is located in another directory, specify the path like this:
 
 ```bash
-docker run -d -p 7070:7070 --env-file /path/to/.env pomodoro-report-backend:1.0.0
+docker run -d -p <port>:<port> --env-file /path/to/.env pomodoro-report-backend:1.0.0
 ```
 
 ## Debugging Tips
