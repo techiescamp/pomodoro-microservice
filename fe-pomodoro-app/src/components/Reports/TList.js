@@ -33,6 +33,13 @@ const TList = () => {
             <Report />
         </div>
 
+        {list === null || list === undefined || list.length === 0 
+        ? 
+        <p className='error-msg'>
+            :( Server is in maintainence!! Please refresh the page or try again later
+        </p> 
+        : null}
+
         <div id='tableList'>
             <h4 className='text-center text-decoration-underline my-4'>Focus Report</h4>
             <div className='w-75 mb-4 mx-auto text-center overflow-auto'>

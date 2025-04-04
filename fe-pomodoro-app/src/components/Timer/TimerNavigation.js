@@ -10,6 +10,7 @@ import axios from 'axios';
 import './timer.css';
 
 const apiUrl = config.apiUrl;
+const metricUrl = config.metrics_url
 
 const TimerNavigation = () => {
   const { user } = useAuth(); // Check if guest or user
@@ -21,6 +22,9 @@ const TimerNavigation = () => {
   const [intervalId, setIntervalId] = useState(null);
   const [isTimerStart, setIsTimerStart] = useState(false);
   const [message, setMessage] = useState(null);
+
+  const [shortBreakCounter, setShortBreakCounter] = useState(0); // New state for short break counter
+  const [longBreakCounter, setLongBreakCounter] = useState(0);   // New state for long break counter
 
   // For audio
   const clickAudio = useMemo(() => new Audio(clickSound), []);
@@ -63,15 +67,26 @@ const TimerNavigation = () => {
     setBg(bgColors[tab] || '#ffffff');
   };
 
+  // update metric to backend
+  const updateMetric = async (event, value) => {
+    try{
+      await axios.post(`${metricUrl}`, { event, value })
+    } catch(err) {
+      console.error('Failed to udate metric: ', err)
+    }
+  }
+
   const startTimer = () => {
     if (!isTimerStart) {
       if (clickAudio) clickAudio.play();
+      updateMetric('start')
       setIsTimerStart(true);
     }
   };
 
   const stopTimer = () => {
-    if (clickAudio) clickAudio.play();
+    if (clickAudio) { clickAudio.play() }
+    updateMetric('interrupt')
     setIsTimerStart(false);
     if (intervalId) {
       clearInterval(intervalId);
@@ -81,16 +96,21 @@ const TimerNavigation = () => {
 
   const resetTimer = () => {
     if (clickAudio) clickAudio.play();
+    updateMetric('interrupt')
     stopTimer();
     setTimer(defaultTimers[activeTab]);
   };
 
   const notifyUser = async (taskId) => {
-    const updateTaskElement = list.find(t => t.id === taskId);
+    const updateTaskElement = list?.find(t => t.id === taskId);
+    if(!updateTaskElement) {
+      return;
+    }
     setIsTimerStart(false); // Ensure the start button works properly
 
-    const updates = window.confirm('Your rounds are over. Do you want to submit the task or continue?') ?
-      { ...updateTaskElement, checked: true, timer: formatTime(timer) }
+    const shouldSubmit = window.confirm('Your rounds are over. Do you want to submit the task or continue?')
+    const updates = shouldSubmit ? 
+      { ...updateTaskElement, checked: true, timer: formatTime(timer) } 
       :
       { ...updateTaskElement, act: 1, timer: formatTime(timer) }
     const successMsg = updates.checked ? 'Task submitted' : 'Task rest'
@@ -139,31 +159,49 @@ const TimerNavigation = () => {
   const handleTimerTick = (prevTime, taskId, actLimit) => {
     if (prevTime <= 1) {
       // Stop timer
-      if(alarmAudio) alarmAudio.play();
+      if(alarmAudio) { alarmAudio.play() }
       stopTimer();
+      
+      // update break counters if applicable
+      if(activeTab === 'short') {
+        const newShortBreakCounter = shortBreakCounter + 1
+        setShortBreakCounter(newShortBreakCounter)
+        updateMetric('short', newShortBreakCounter)
+      } else if(activeTab === 'long') {
+        const newLongBreakCounter = longBreakCounter + 1
+        setLongBreakCounter(newLongBreakCounter)
+        updateMetric('long', newLongBreakCounter)
+      }
 
       // Update rounds
-      const updatedRounds = roundsCompleted + 1;
-      setRoundsCompleted(updatedRounds);
-
-      // Notify user if rounds are complete
-      if (updatedRounds >= actLimit) {
-        setTimeout(() => notifyUser(taskId), 1000); // Slight delay for smoother audio play
-      } else {
-        setTimer(defaultTimers[activeTab]); // Reset timer for the next round
-        startTimer()
+      if(taskId) {
+        const updatedRounds = roundsCompleted + 1;
+        setRoundsCompleted(updatedRounds);
+        // Notify user if rounds are complete
+        if (updatedRounds >= actLimit) {
+          setTimeout(() => notifyUser(taskId), 1000); // Slight delay for smoother audio play
+        }
       }
+
+      setTimer(defaultTimers[activeTab]); // Reset timer for the next round
+      // startTimer()
       return defaultTimers[activeTab]; // Prevent timer from going below 0
     }
     return prevTime - 1;
   }
 
   useEffect(() => {
-    if (!isTimerStart || intervalId) return
+    if (!isTimerStart) {
+      if(intervalId) {
+        clearInterval(intervalId)
+        setIntervalId(null)
+      }
+      return
+    } 
 
     const firstIncompleteTask = list?.find(t => !t.checked);
     const taskId = firstIncompleteTask?.id
-    const actLimit = firstIncompleteTask.act || 0
+    const actLimit = firstIncompleteTask?.act || 0
 
     const id = setInterval(() => {
       setTimer(prev => handleTimerTick(prev, taskId, actLimit))
@@ -176,8 +214,7 @@ const TimerNavigation = () => {
         setIntervalId(null)
       }
     }
-  }, [isTimerStart, intervalId, list, setTimer]);
-
+  }, [isTimerStart]);
 
 
   const getTabLabel = (tab) => {

@@ -36,8 +36,7 @@ const addTask = async (req, res) => {
         isUserExisted.userTasks.push({
           ...addTask.userTasks,
           date: new Date(taskDate)
-      })
-
+        })
       } else { // already date existed
         isUserExisted.userTasks[checkDate].tasks.push(...addTask.userTasks.tasks)
       }
@@ -73,6 +72,7 @@ const addTask = async (req, res) => {
     }
     logger.info('add task ', logFormat(req, logResult))
     span.end()
+    metrics.tasksCreatedCounter.inc()
     return res.status(200).send(doc)
   }
   catch(err) {

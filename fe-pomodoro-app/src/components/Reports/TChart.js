@@ -142,6 +142,13 @@ const TChart = () => {
         <Report />
       </div>
 
+      {list === null || list === undefined || list.length === 0 
+        ? 
+        <p className='error-msg'>
+            :( Server is in maintainence!! Please refresh the page or try again later
+        </p> 
+      : null}
+
       <div id='chart-container'>
         <h3 className='my-4 text-center text-decoration-underline fw-bold'>Report of your focus</h3>
         {!user && <p className='text-secondary text-center fs-4 fw-semibold py-2'>! Please login to view your reports</p>}
