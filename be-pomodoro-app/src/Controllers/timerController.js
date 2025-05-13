@@ -26,20 +26,19 @@ const addTask = async (req, res) => {
       // format date for display
       const taskDate = new Date(addTask.userTasks.date)
 
-      const checkDate = isUserExisted.userTasks.findIndex(t => {
+      const checkDateIndex = isUserExisted.userTasks.findIndex(t => {
         const existingDate = new Date(t.date)
         return existingDate.toISOString().split('T')[0] === taskDate.toISOString().split('T')[0]
       })
       
       // new date
-      if (checkDate === -1) {
+      if (checkDateIndex === -1) {
         isUserExisted.userTasks.push({
           ...addTask.userTasks,
           date: new Date(taskDate)
-      })
-
+        })
       } else { // already date existed
-        isUserExisted.userTasks[checkDate].tasks.push(...addTask.userTasks.tasks)
+        isUserExisted.userTasks[checkDateIndex].tasks.push(...addTask.userTasks.tasks)
       }
       
       const filter = { 'userData.userId': { $in: [user.userId] } }
@@ -60,7 +59,7 @@ const addTask = async (req, res) => {
       // db mterics
       const queryStartTime = process.hrtime()
       doc = new TaskTracker(payload)
-      doc.save()
+      await doc.save()
       //
       const queryEndTime = process.hrtime(queryStartTime)
       const queryDuration = queryEndTime[0]*1e9 + queryEndTime[1]
@@ -73,6 +72,7 @@ const addTask = async (req, res) => {
     }
     logger.info('add task ', logFormat(req, logResult))
     span.end()
+    metrics.tasksCreatedCounter.inc()
     return res.status(200).send(doc)
   }
   catch(err) {
@@ -95,22 +95,21 @@ const getTasks = async (req, res) => {
   try {
     // db metrics
     const queryStartTime = process.hrtime();
-    const { userTasks } = await TaskTracker.findOne({ "userData.userId": userId }, { userTasks: 1 })
+    const taskDoc = await TaskTracker.findOne({ "userData.userId": userId }, { userTasks: 1 })
+    const userTasks = taskDoc?.userTasks ?? []
     //
     const queryEndTime = process.hrtime(queryStartTime);
     const queryDuration = queryEndTime[0] * 1e9 + queryEndTime[1];
     metrics.databaseQueryDurationHistogram.observe({ operation: 'Fetch unchecked tasks - findOne', success: userTasks ? 'true' : 'false' }, queryDuration / 1e9);
-    // 
-    if(!userTasks) {
-
-    }
-    const logResult = {
+    
+    const notCheckedTasks = Array.isArray(userTasks) 
+      ? userTasks.map(t => t.tasks.filter(i => !i.checked)).flat()
+      : []
+      const logResult = {
       userId: userId,
       statusCode: res.statusCode
     }
     logger.info('Get unchecked task to index page', logFormat(req, logResult))
-
-    const notCheckedTasks = userTasks.map(t => t.tasks.filter(i => !i.checked)).flat()
     span.end()
     return res.status(200).send(notCheckedTasks)
   }

@@ -106,6 +106,7 @@ app.get('/metrics', async (req, res) => {
 
 app.post("/metrics", (req, res) => {
   const client = req.body;
+  console.log('client: ', client)
   if (typeof client.app_time === 'number') {
     metrics.pageLoadTimeGauge.set(client.app_time / 1000);
   }
@@ -115,13 +116,18 @@ app.post("/metrics", (req, res) => {
   if(client.download === 'download') {
     metrics.downloadReportsCounter.inc();
   }
-  if(client.timername === 'short') {
-    metrics.shortBreakCounter.inc();
-  } else if(client.timername === 'long') {
-    metrics.longBreakCounter.inc();
-  } else if(client.timername === 'timer') {
-    metrics.tasksCreatedCounter.inc();
+  if(client.event === 'start') {
+    metrics.startButtonClick.inc()
   }
+  if(client.event === 'interrupt') {
+    metrics.interruptedTaskCount.inc()
+  }
+  if(client.event === 'short') {
+    metrics.shortBreakCounter.inc(client.value || 1); // Increment by value (counter) or 1
+  }
+  if(client.event === 'long') {
+    metrics.longBreakCounter.inc(client.valu || 1); // Increment by value (counter) or 1
+  } 
   return res.status(200).send('client metrics recorded');
 });
 

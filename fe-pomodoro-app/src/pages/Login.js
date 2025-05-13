@@ -1,10 +1,7 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import config from '../config';
 import { useAuth } from '../context/AuthContext';
-
-const apiUrl = config.apiUrl;
+import axiosCustomApi from '../axiosLib';
 
 const Login = () => {
     const { login, xCorrId } = useAuth()
@@ -37,7 +34,7 @@ const Login = () => {
         }
         const cid = xCorrId || `pomo-${Math.ceil(Math.random()*1000)}`;
         try {
-            const response = await axios.post(`${apiUrl}/auth/login`, { userLogin }, {
+            const response = await axiosCustomApi.post(`/auth/login`, { userLogin }, {
                 headers: { 'x-correlation-id': cid }
             })
             setStatus({message: response.data.message, statusCode: response.data.status})
@@ -69,7 +66,7 @@ const Login = () => {
                     <h3 className='m-3'>LOGIN FORM</h3>
                     {status ? 
                         <p style={inlineStyle} className={status.statusCode === 'success' ? 'text-success' : 'text-danger'}>
-                            {status.message && status.message}</p> 
+                            {status?.message}</p> 
                     : null
                     }
 
@@ -80,7 +77,7 @@ const Login = () => {
                                 name='email'
                                 value={userLogin.email}
                                 onChange={handleChange}
-                                autoComplete='current-email'
+                                autoComplete='email'
                                 className='form-control mb-3 border border-secondary rounded-1'
                                 placeholder='Enter your email'
                                 required

@@ -1,12 +1,10 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import './reports.css'
 import { useAuth } from '../../context/AuthContext'
 import './reports.css'
 
 const Report = () => {
     const { user } = useAuth()
-
 
   return (
         <ul className='navbar nav p-md-2 justify-content-center flex-nowrap' id='timerNavigation'>

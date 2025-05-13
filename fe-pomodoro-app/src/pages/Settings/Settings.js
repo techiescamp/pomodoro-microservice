@@ -1,10 +1,7 @@
 import React, { useState } from 'react';
-import './settings.css'
-import config from '../../config';
+import './settings.css';
 import { useAuth } from '../../context/AuthContext';
-import axios from 'axios'
-
-const apiUrl = config.apiUrl
+import axiosCustomApi from '../../axiosLib';
 
 const Settings = () => {
     const { user, setUser, xCorrId } = useAuth()
@@ -35,7 +32,7 @@ const Settings = () => {
             const confirm = window.confirm('Are you sure you want to change your password?');
             if (!confirm) return;
         }
-        const resp = await axios.post(`${apiUrl}/auth/update-user`, 
+        const resp = await axiosCustomApi.post(`/auth/update-user`, 
             { profile },
             { headers: { 
                 Authorization: `Bearer ${token}`,
@@ -87,7 +84,7 @@ const Settings = () => {
                 {profile.msg ? 
                 <p className='close bg-success-subtle p-2 text-success rounded-3 d-flex justify-content-between'>
                     {profile.msg} 
-                    <span className='me-5' onClick={closeBtn}>x</span>
+                    <button className='me-5' onClick={closeBtn}>x</button>
                 </p>
                 : null}
 

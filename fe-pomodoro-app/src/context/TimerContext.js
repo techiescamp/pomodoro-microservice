@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useEffect } from 'react'
+import React, { createContext, useContext, useState, useEffect, useMemo } from 'react'
+import PropTypes from 'prop-types';
 
 const TimerContext = createContext()
 
@@ -36,11 +37,16 @@ export const TimerContextProvider = ({ children }) => {
     };
   }, []);
 
+  const contextValue = useMemo(() => ({ timer, setTimer, bg, setBg }), [timer, bg]);
+
   return (
-    <TimerContext.Provider value={{ timer, setTimer, bg, setBg }}>
+    <TimerContext.Provider value={contextValue}>
       {children}
     </TimerContext.Provider>
   )
 }
+TimerContextProvider.propTypes = {
+  children: PropTypes.node.isRequired,
+};
 
 export const useTimer = () => useContext(TimerContext)

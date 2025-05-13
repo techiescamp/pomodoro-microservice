@@ -1,9 +1,6 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom';
-import config from '../config';
-import axios from 'axios'
-
-const apiUrl = config.apiUrl;
+import axiosCustomApi from '../axiosLib';
 
 const Signup = () => {
     const navigate = useNavigate();
@@ -35,7 +32,7 @@ const Signup = () => {
         }
         const cid = `pomo-${Math.ceil(Math.random()*200)}`;
         try {
-            const response = await axios.post(`${apiUrl}/auth/signup`, { register }, {
+            const response = await axiosCustomApi.post(`/auth/signup`, { register }, {
                 headers: { 'x-correlation-id': cid }
             })
             setStatus({message: response.data.message, statusCode: response.data.status})
@@ -69,7 +66,7 @@ const Signup = () => {
             <div className="form-container mx-auto pt-5">
                 <div className='form-wrapper mx-auto border border-outline-secondary p-2 bg-light'>
                     <h3 className='m-3'>SIGN UP FORM</h3>
-                    {status && <p style={inlineStyle}>{status.message && status.message} !</p>}
+                    {status && <p style={inlineStyle}>{status?.message} !</p>}
 
                     <form onSubmit={handleSubmit}>
                         <div className='w-75 mx-auto'>

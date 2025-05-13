@@ -1,8 +1,9 @@
-import React, { createContext, useContext, useEffect, useState } from 'react'
-import config from '../config'
+import React, { createContext, useContext, useEffect, useState, useMemo } from 'react'
+import PropTypes from 'prop-types'
+import axiosCustomApi from '../axiosLib'
 
 const AuthContext = createContext()
-const apiUrl = config.apiUrl
+
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null)
@@ -13,18 +14,19 @@ export const AuthProvider = ({ children }) => {
     useEffect(() => {
         const token = sessionStorage.getItem('token')
         if(token) {
-            fetch(`${apiUrl}/auth/verify-user`, { 
-                    method: 'GET',
-                    headers: { Authorization: `Bearer ${token}`, }
-                }
-            )
-            .then(res => res.json())
-            .then(result => {
-                setUser(result)
-            })
-            .catch(() => sessionStorage.removeItem('token')) // remove token if invalid
+            getUserVerification(token)
+        } else {
+            sessionStorage.removeItem('token') // remove token if invalid
         }
     },[])
+
+    async function getUserVerification(token) {
+        const result = await axiosCustomApi.get('/auth/verify-user', {
+            headers: { Authorization: `Bearer ${token}`, }
+        })
+        console.log('user verified: ', result)    
+        setUser(result)
+    }
 
     
     const login = (userData, token) => {
@@ -33,8 +35,13 @@ export const AuthProvider = ({ children }) => {
     }
 
 
+    const contextValue = useMemo(() => ({ user, setUser, xCorrId, setXCorrId, login }), [user, xCorrId])
+    AuthProvider.propTypes = {
+        children: PropTypes.node.isRequired,
+    }
+
     return (
-        <AuthContext.Provider value={{ user, setUser, xCorrId, setXCorrId, login }}>
+        <AuthContext.Provider value={contextValue}>
             {children}
         </AuthContext.Provider>
     )
