@@ -1,9 +1,6 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom';
-import config from '../config';
-import axios from 'axios'
-
-const apiUrl = config.apiUrl;
+import axiosCustomApi from '../axiosLib';
 
 const Signup = () => {
     const navigate = useNavigate();
@@ -35,7 +32,7 @@ const Signup = () => {
         }
         const cid = `pomo-${Math.ceil(Math.random()*200)}`;
         try {
-            const response = await axios.post(`${apiUrl}/auth/signup`, { register }, {
+            const response = await axiosCustomApi.post(`/auth/signup`, { register }, {
                 headers: { 'x-correlation-id': cid }
             })
             setStatus({message: response.data.message, statusCode: response.data.status})

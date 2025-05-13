@@ -2,10 +2,7 @@ import React, { useEffect } from 'react'
 import { useTask } from '../../context/TaskContext'
 import { useTimer } from '../../context/TimerContext'
 import { useAuth } from '../../context/AuthContext'
-import config from '../../config'
-import axios from 'axios'
-
-const apiUrl = config.apiUrl
+import axiosCustomApi from '../../axiosLib'
 
 const TaskForm = () => {
   const { todo, setTodo, setIsTodo, list, setList, setIsNoUserTodo, generateId, isEdit, setIsEdit, editData, setEditData } = useTask()
@@ -80,7 +77,7 @@ const TaskForm = () => {
             tasks: [todo]
           }
         }
-        const resp = await axios.post(`${apiUrl}/api/addTask`, { addTask }, {
+        const resp = await axiosCustomApi.post(`/api/addTask`, { addTask }, {
           headers: { Authorization: `Bearer ${token}` }
         });
         if (resp.data) setIsTodo(prev => prev + 1)
@@ -113,7 +110,7 @@ const TaskForm = () => {
       }
       else {
         const updatedTask = { ...editData }
-        await axios.put(`${apiUrl}/api/editData/${editData.id}`,
+        await axiosCustomApi.put(`/api/editData/${editData.id}`,
           { updatedTask },
           { headers: { Authorization: `Bearer ${token}` } }
         )

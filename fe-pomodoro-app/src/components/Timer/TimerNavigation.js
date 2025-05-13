@@ -5,12 +5,8 @@ import { useTimer } from '../../context/TimerContext';
 import { useTask } from '../../context/TaskContext';
 import clickSound from '../../assets/audio/Mouse_Click.mp3';
 import alarmSound from '../../assets/audio/clock-alarm.mp3';
-import config from '../../config';
-import axios from 'axios';
+import axiosCustomApi from '../../axiosLib'
 import './timer.css';
-
-const apiUrl = config.apiUrl;
-const metricUrl = config.metrics_url
 
 const TimerNavigation = () => {
   const { user } = useAuth(); // Check if guest or user
@@ -70,7 +66,7 @@ const TimerNavigation = () => {
   // update metric to backend
   const updateMetric = async (event, value) => {
     try{
-      await axios.post(`${metricUrl}`, { event, value })
+      await axiosCustomApi.post(`/metrics`, { event, value })
     } catch(err) {
       console.error('Failed to udate metric: ', err)
     }
@@ -120,8 +116,8 @@ const TimerNavigation = () => {
 
   const updateTask = async (id, updates, successMessage, errorMessage) => {
     try {
-      const resp = user ? await axios.put(
-        `${apiUrl}/api/updateTask/${id}`,
+      const resp = user ? await axiosCustomApi.put(
+        `/api/updateTask/${id}`,
         updates,
         { headers: { Authorization: `Bearer ${token}` } }
       ) : null

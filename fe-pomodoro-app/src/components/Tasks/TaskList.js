@@ -1,12 +1,8 @@
 import React, { useEffect } from 'react'
-import axios from 'axios'
+import axiosCustomApi from '../../axiosLib'
 import { useAuth } from '../../context/AuthContext'
 import { useTask } from '../../context/TaskContext'
-import config from '../../config'
 import './task.css'
-
-
-const apiUrl = config.apiUrl
 
 const TaskList = () => {
     const { user } = useAuth()
@@ -16,7 +12,7 @@ const TaskList = () => {
     useEffect(() => {
         const fetchTasks = async () => {
             try {
-                const resp = await axios.get(`${apiUrl}/api/getTasks`, {
+                const resp = await axiosCustomApi.get(`/api/getTasks`, {
                     headers: { Authorization: `Bearer ${token}` }
                 })
                 setList(resp.data)
@@ -31,7 +27,7 @@ const TaskList = () => {
         // update backend
         try {
             const task = list.find(t => t.id === id)
-            const resp = await axios.put(`${apiUrl}/api/updateTask/${id}`,
+            const resp = await axiosCustomApi.put(`/api/updateTask/${id}`,
                 {
                     checked: !task.checked,
                     act: task.act || 1
@@ -55,7 +51,7 @@ const TaskList = () => {
 
     const handleDeleteTask = async (id) => {
         try {
-            await axios.delete(`${apiUrl}/api/deleteTask/${id}`,
+            await axiosCustomApi.delete(`/api/deleteTask/${id}`,
                 { headers: { Authorization: `Bearer ${token}` } }
             )
             setList(list.filter(t => t.id !== id))
