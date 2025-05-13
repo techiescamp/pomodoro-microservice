@@ -21,7 +21,6 @@ const TimerNavigation = () => {
 
   const [shortBreakCounter, setShortBreakCounter] = useState(0); // New state for short break counter
   const [longBreakCounter, setLongBreakCounter] = useState(0);   // New state for long break counter
-
   // For audio
   const clickAudio = useMemo(() => new Audio(clickSound), []);
   const alarmAudio = useMemo(() => new Audio(alarmSound), []);
