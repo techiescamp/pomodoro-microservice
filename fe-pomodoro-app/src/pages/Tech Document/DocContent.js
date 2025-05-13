@@ -3,8 +3,8 @@ import ReactMarkdown from 'react-markdown'
 import { useParams } from 'react-router-dom'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism'
-import axios from 'axios'
 import PropTypes from 'prop-types'
+import axiosCustomApi from '../../axiosLib'
 
 const CodeBlock = ({ inline, className, children, ...props }) => {
   const match = /language-(\w+)/.exec(className || '');
@@ -26,7 +26,7 @@ const DocContent = () => {
   useEffect(() => {
     const fetchDoc = async () => {
       try {
-        const res = slug ? await axios.get(`http://localhost:7000/doc/${slug}`) : setSelectedDoc({ content: 'None of the data is written for this topic.' })
+        const res = slug ? await axiosCustomApi.get(`/doc/${slug}`) : setSelectedDoc({ content: 'None of the data is written for this topic.' })
         setSelectedDoc(res.data)
       } catch(err) {
         setSelectedDoc({ content: 'Oops server is not connected. Please wait for sometime' })

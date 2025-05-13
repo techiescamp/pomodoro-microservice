@@ -19,11 +19,12 @@ const subscribe = async (req, res) => {
     const queryDuration = queryEndTime[0] * 1e9 + queryEndTime[1];
     metrics.databaseQueryDurationHistogram.observe({operation: 'Subscribers - findOne', success: existingUser ? 'true': 'false'}, queryDuration / 1e9);
     
+  
+    if(existingUser) {
     const logResult = {
         userId: existingUser.userId,
         statusCode: res.statusCode,
     }
-    if(existingUser) {
         span.addEvent('user already subscrbed!');
         logger.info('User already subscribed to our pomodoro app', logFormat(req, logResult))
         span.end();
@@ -70,6 +71,7 @@ const sendMails = async(req, res) => {
                 emailId: to,
                 statusCode: res.statusCode
             }
+            console.error('error sending mail', err);
             span.addEvent('subscription mail failed to sent')
             logger.error('Failed to sent email subscription', logFormat(req, logResult))
             span.setAttribute('error', true); // Mark this span as an error
