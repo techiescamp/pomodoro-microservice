@@ -35,7 +35,7 @@ services:
     container_name: pomodoro-fe
     restart: unless-stopped
     ports:
-      - "80:3000"
+      - "3000:3000"
     networks:
       - pomodoro-nw
     env_file:

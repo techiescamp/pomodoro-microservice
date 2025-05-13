@@ -2,10 +2,7 @@ import React, { useEffect } from 'react'
 import Report from './Report'
 import { useTask } from '../../context/TaskContext'
 import { useAuth } from '../../context/AuthContext'
-import axios from 'axios'
-import config from '../../config'
-
-const apiUrl = config.apiUrl
+import axiosCustomApi from '../../axiosLib'
 
 const TList = () => {
     const { user } = useAuth()
@@ -15,7 +12,7 @@ const TList = () => {
     useEffect(() => {
         const fetchTasks = async () => {
             try {
-                const resp = await axios.get(`${apiUrl}/api/getAllTasks`, {
+                const resp = await axiosCustomApi.get(`/api/getAllTasks`, {
                     headers: { Authorization: `Bearer ${token}` }
                 })
                 setList(resp.data.userTasks)

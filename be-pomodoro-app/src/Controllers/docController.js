@@ -1,5 +1,6 @@
 const fs = require('fs').promises
-const { metrics } = require('@opentelemetry/api')
+const metrics = require('../Observability/metrics')
+
 const path = require('path')
 
 const docsDirectory = path.join(__dirname, '../docs')
@@ -28,7 +29,7 @@ const getDoc = async(req, res) => {
         metrics.documentPageClick.inc()
         return res.json({title: req.params.slug, content})
     } catch(err) {
-        res.status(200).json({error: "doc not found"})
+        res.status(500).json({error: "doc not found"})
     }
 }
 

@@ -1,10 +1,7 @@
 import React, { useState } from 'react';
-import './settings.css'
-import config from '../../config';
+import './settings.css';
 import { useAuth } from '../../context/AuthContext';
-import axios from 'axios'
-
-const apiUrl = config.apiUrl
+import axiosCustomApi from '../../axiosLib';
 
 const Settings = () => {
     const { user, setUser, xCorrId } = useAuth()
@@ -35,7 +32,7 @@ const Settings = () => {
             const confirm = window.confirm('Are you sure you want to change your password?');
             if (!confirm) return;
         }
-        const resp = await axios.post(`${apiUrl}/auth/update-user`, 
+        const resp = await axiosCustomApi.post(`/auth/update-user`, 
             { profile },
             { headers: { 
                 Authorization: `Bearer ${token}`,
