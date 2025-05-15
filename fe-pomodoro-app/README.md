@@ -30,6 +30,12 @@ REACT_APP_JAEGER_TRACE_URL=<jaeger-trace-url>
 - *REACT_APP_METRICS_URL*: URL for metrics endpoint.
 - *REACT_APP_JAEGER_TRACE_URL*: (Optional) URL for Jaeger tracing, if available.
 
+## Production deployment steps:
+Make sure .env file has corrected vars
+REACT_APP_UI_URL = UI_IP_ADDRESS/api
+1. ```npm install```
+2. ```npm run build```
+3. ```node server.js```
 
 ## Run Docker Image
 

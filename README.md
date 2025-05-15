@@ -173,6 +173,20 @@ MONGODB_URL=<mongodburl>
 - *MONGODB_URL*: The connection URL for your MongoDB database.
 
 
+## Production deployment steps:
+*fe-pomodoro-app*
+
+Make sure .env file has corrected vars
+
+REACT_APP_UI_URL = UI_IP_ADDRESS/api
+1. ```npm install```
+2. ```npm run build```
+3. ```node server.js```
+
+*be-pomodoro-app*
+.env var change
+UI_BASE_URL = UI_IP_ADDRESS
+
 #### Run Docker Image
 
 Run the Docker container using this command:
