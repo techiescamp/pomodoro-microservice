@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const { createProxyMiddleware } = require('http-proxy-middleware');
+
 const app = express();
 
 // Serve static files
@@ -9,7 +10,7 @@ app.use(express.static(path.join(__dirname, 'build')));
 
 // Proxy /api to your backend
 app.use('/api', createProxyMiddleware({
-  target: process.env.REACT_APP_API_URL || 'http://localhost:7000', // Replace with your backend URL
+  target: process.env.REACT_APP_BACKEND_API_URL || 'http://localhost:7000', // Replace with your backend URL
   changeOrigin: true,
 }));
 
