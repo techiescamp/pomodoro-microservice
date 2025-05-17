@@ -3,7 +3,7 @@ const { default: config } = require('./config');
 
 module.exports = function(app) {
     app.use("/api", createProxyMiddleware({
-        target: config.apiUrl,
+        target: config.backend_api_Url,
         changeOrigin: true,
     }))
 }

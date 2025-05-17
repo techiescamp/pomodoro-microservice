@@ -13,3 +13,4 @@ COPY --from=build /home/node/app /usr/src/app
 COPY --from=build /home/node/app /usr/src/app/src
 EXPOSE 3000
 CMD ["npm", "start"]
+# we don't have to do npm start but do npm run build and node server.js

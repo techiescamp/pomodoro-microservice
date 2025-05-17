@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import Pomodoro from '../components/Pomodoro/Pomodoro'
 import PomodoroContent from '../components/Pomodoro/PomodoroContent';
-// import config from '../config';
 import axiosCustomApi from '../axiosLib';
 
 const start = performance.now();
 let loadTime = 0;
-// const metrics_url = config.metrics_url;
 
 const Home = () => {
     const [errCount, setErrCount] = useState(0);
