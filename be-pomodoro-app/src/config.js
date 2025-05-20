@@ -10,11 +10,8 @@ const config = {
     secrets: {
         jwt_key: process.env.JWT_SECRET
     },
-    session: {
-        secret: process.env.SESSION_SECRET
-    },
     urls: {
-        baseUrl: process.env.BASE_URL,
+        baseUrl: process.env.UI_BASE_URL,
         reportsUrl: process.env.REPORTS_URL
     },
     mail: {

@@ -2,10 +2,7 @@ import React, { useEffect } from 'react'
 import Report from './Report'
 import { useTask } from '../../context/TaskContext'
 import { useAuth } from '../../context/AuthContext'
-import axios from 'axios'
-import config from '../../config'
-
-const apiUrl = config.apiUrl
+import axiosCustomApi from '../../axiosLib'
 
 const TList = () => {
     const { user } = useAuth()
@@ -15,7 +12,7 @@ const TList = () => {
     useEffect(() => {
         const fetchTasks = async () => {
             try {
-                const resp = await axios.get(`${apiUrl}/api/getAllTasks`, {
+                const resp = await axiosCustomApi.get(`/api/getAllTasks`, {
                     headers: { Authorization: `Bearer ${token}` }
                 })
                 setList(resp.data.userTasks)
@@ -32,6 +29,13 @@ const TList = () => {
         <div className='bg-report'>
             <Report />
         </div>
+
+        {list === null || list === undefined || list.length === 0 
+        ? 
+        <p className='error-msg'>
+            :( Server is in maintainence!! Please refresh the page or try again later
+        </p> 
+        : null}
 
         <div id='tableList'>
             <h4 className='text-center text-decoration-underline my-4'>Focus Report</h4>

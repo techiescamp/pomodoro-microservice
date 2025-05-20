@@ -1,11 +1,8 @@
 import React, { useState } from 'react'
-import axios from 'axios';
-import config from '../../config';
-
-const apiUrl = config.apiUrl;
+import axiosCustomApi from '../../axiosLib';
 
 const FooterForm = () => {
-    const [subscribeEmail, setSubscribeEmail] = useState(null);
+    const [subscribeEmail, setSubscribeEmail] = useState('');
 
     const handleFooterEmail = (e) => {
         setSubscribeEmail({
@@ -15,7 +12,7 @@ const FooterForm = () => {
 
     const handleFooterSubmit = async (e) => {
         e.preventDefault();
-        const sent = await axios.post(`${apiUrl}/subscribe`, subscribeEmail)
+        const sent = await axiosCustomApi.post(`/subscribe`, subscribeEmail)
         alert(sent.data)
         const mailBody = {
             to: subscribeEmail,
@@ -35,9 +32,9 @@ const FooterForm = () => {
                 </div>
             `
         }
-        const result = await axios.post(`${apiUrl}/send-mail`, mailBody)
+        const result = await axiosCustomApi.post(`/send-mail`, mailBody)
         alert(result.data)
-        setSubscribeEmail(null)
+        setSubscribeEmail('')
 }
 
 return (

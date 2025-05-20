@@ -17,14 +17,14 @@ docker build -t pomodoro-backend:1.0.0 .
 Create a .env file with the following content:
 
 ```bash
-PORT=7000
-BASE_URL=http://localhost:3000
-REPORTS_URL=http://localhost:7070
+PORT=<port-number>
+BASE_URL=<base-url-frontend:http://localhost:3000>
+REPORTS_URL=<another-server-url:http://localhost:4000>
 
-JAEGER_TRACE_URI=http://52.43.65.153:30894
+JAEGER_TRACE_URI=<jaeger-tracr-url>
 
-SESSION_SECRET=supersecret
-JWT_SECRET=mysecret
+SESSION_SECRET=<session-secret>
+JWT_SECRET=<jwt-secret>
 
 MONGODB_URL=<mongodburl>
 ```
@@ -44,13 +44,13 @@ MONGODB_URL=<mongodburl>
 Run the Docker container using this command:
 
 ```bash
-docker run -d -p 7000:7000 --env-file .env pomodoro-backend:1.0.0
+docker run -d -p <port>:<port> --env-file .env pomodoro-backend:1.0.0
 ```
 
 If your *.env* file is located in another directory, specify the path like this:
 
 ```bash
-docker run -d -p 7000:7000 --env-file /path/to/.env pomodoro-backend:1.0.0
+docker run -d -p <port>:<port> --env-file /path/to/.env pomodoro-backend:1.0.0
 ```
 
 ## Debugging Tips

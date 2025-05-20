@@ -1,10 +1,11 @@
 const fs = require('fs').promises
+const metrics = require('../Observability/metrics')
+
 const path = require('path')
 
 const docsDirectory = path.join(__dirname, '../docs')
 
 const getSidebarTitles = async (req, res) => {
-    
     try {
         const files = await fs.readdir(docsDirectory) // gets file names in 'docs/' folder
         const docs = files.map(file => ({
@@ -24,9 +25,11 @@ const getDoc = async(req, res) => {
     try {
         const filePath = path.join(docsDirectory, `${slug}.md`)
         const content = await fs.readFile(filePath, 'utf8')
-        res.json({title: req.params.slug, content})
+        metrics.httpRequestCounter.inc()
+        metrics.documentPageClick.inc()
+        return res.json({title: req.params.slug, content})
     } catch(err) {
-        res.status(200).json({error: "doc not found"})
+        res.status(500).json({error: "doc not found"})
     }
 }
 

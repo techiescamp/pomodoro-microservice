@@ -40,6 +40,8 @@ header nav {
 }
 
 .avatar {
+    width: 24px;
+    height: 24px;
     background-color: palevioletred;
     color: white;
     border-radius: 50%;

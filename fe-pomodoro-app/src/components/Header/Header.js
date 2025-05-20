@@ -55,16 +55,18 @@ function Header() {
                         <p className='mb-0'>#{user.email}</p>
                       </Link>
                     </li>
-                    <li className="nav-item mx-auto me-lg-4 mb-2 mb-lg-0">
-                      <Link className='nav-link' to='/doc'>Document</Link>
-                    </li>
                     <li className='dropdown-item mb-1 py-2'>
                       <Link to={`/${user.displayName}/settings`} className="text-decoration-none text-black">
                         <i className="bi bi-person-circle me-3"></i>Settings
                       </Link>
                     </li>
+                    <li className="dropdown-item mb-1 py-2">
+                      <Link className='text-decoration-none text-black' to='/doc'>
+                      <i className="bi bi-file-text-fill me-3"></i>Document
+                      </Link>
+                    </li>
                     <li className='dropdown-item mb-1 py-2'>
-                      <button className='btn btn-link text-black p-0' onClick={logout}>
+                      <button className='btn text-black p-0' onClick={logout}>
                         <i className="bi bi-box-arrow-right me-3"></i>Logout
                       </button>
                     </li>
