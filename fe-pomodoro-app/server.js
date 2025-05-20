@@ -14,12 +14,14 @@ app.use('/api', createProxyMiddleware({
   changeOrigin: true,
 }));
 
+console.log('process.env.REACT_APP_BACKEND_API_URL', process.env.REACT_APP_BACKEND_API_URL);
+
 // Catch-all to serve index.html
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = 3000;
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
