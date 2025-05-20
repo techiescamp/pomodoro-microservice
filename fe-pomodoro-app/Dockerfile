@@ -1,16 +1,17 @@
-# Stage 1: Build
-FROM public.ecr.aws/docker/library/node:22.14.0-slim AS build
-RUN mkdir -p /home/node/app/node_modules && chown -R node:node /home/node/app
-WORKDIR /home/node/app
-COPY ["./package*.json", "/home/node/app"]
-RUN npm install --production --frozen-lockfile
-COPY ./src/ /home/node/app
-# Stage 2: Runtime
-FROM public.ecr.aws/docker/library/node:22.14.0-slim AS runtime
-WORKDIR /usr/src/app
-USER node
-COPY --from=build /home/node/app /usr/src/app
-COPY --from=build /home/node/app /usr/src/app/src
+FROM node:22.14.0-slim
+
+WORKDIR /app
+
+COPY /public ./public
+COPY /src ./src
+COPY /package*.json ./
+COPY .env ./
+COPY server.js ./
+
+RUN npm install
+
+RUN npm run build
+
 EXPOSE 3000
-CMD ["npm", "start"]
-# we don't have to do npm start but do npm run build and node server.js
+
+CMD ["node", "server.js"]
